@@ -4,7 +4,8 @@
 @REM nasm boot.asm -f bin -o build/boot.bin
 
 @REM compile the kernel
-gcc -Wall -Wextra -Werror kernel.c -ffreestanding -nostdlib -m32 -g -c -Wl,--oformat=binary -o build/kernel.bin -I include
+gcc -Wall -Wextra -Werror kernel.c -ffreestanding -nostdlib -m32 -g -c -Wl,--oformat=binary -o build/kernel.o -I include
+objcopy -O binary -j .text build/kernel.o build/kernel.bin
 
 cd build
 
