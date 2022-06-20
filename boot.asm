@@ -7,47 +7,38 @@
 ;                                                                              ;
 ;-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+;
 [bits 16]    ; We start in 16-bit real mode
-[org 0x7c00] ; The BIOS loads us in to 7c00-7dff
+[org 0x7c00] ; The BIOS loads us at 7c00
 
-jmp 0x0000:boot ; Jump to entry with CS=0
+cld ; Clear the direction flag so string ops count up
 
-boot:
-	; Switch to 80x25x16 text mode (clears screen)
-	xor ah, ah
-	mov al, 3
-	int 0x10
+; Set up a buffer for the kernel
+mov bx, 0x1000
+mov es, bx
+xor bx, bx ; At 1MiB
 
-	; Kernel code buffer setup
-	xor ax, ax
-	mov es, ax
-	mov bx, 0x7e00 ; Right after boot sector
+mov ah, 2  ; Command 2 - read sectors
+mov al, 72 ; 72 sectors (max allowed by bochs BIOS)
+mov cx, 10 ; Track 0, sector 10
+xor dx, dx ; Drive 0, head 0
+int 0x13
 
-	; Load kernel into memory
-	mov ah, 2
-	mov al, 1 ; Read kernel code
-	xor ch, ch
-	mov dh, ch
-	mov cl, 2
-	int 0x13 ; Read!
+; Check carry and return code for errors
+jc diskError
+cmp ah, 0
+jne diskError
 
-	; Disk error handling
-	jc diskError
-	cmp ah, 0
-	jne diskError
+cli ; Disable interrupts
 
-	cli ; Disable interrupts
-	cld ; Clear direction flag so string ops count up
+lgdt [gdt_descriptor] ; Load the GDT
 
-	lgdt [GDT_descriptor] ; Load Global Descriptor Table
+; Set Protect Enable bit in control register 0
+mov eax, cr0
+or al, 1
+mov cr0, eax
 
-	; Set Protected Enable bit in cr0
-	mov eax, cr0
-	or eax, 1
-	mov cr0, eax
+jmp 8:initProtected
 
-	jmp CODE_SEG:initProtected ; We are in protected mode, jump to the kernel
-
-diskErrorMsg: db "Non-system disk or disk error", 0
+diskErrorMsg: db "A disk read error occurred.", 0
 diskError:
 	mov si, diskErrorMsg
 	mov ah, 0xe
@@ -58,60 +49,43 @@ diskError:
 		je diskError.exit
 
 		int 0x10
-		add si, 1
+		inc si
 		jmp diskError.loop
 	diskError.exit:
-		jmp $
+		cli ; No interrupts
+		hlt ; Hang :~(
 
-GDT_start:
-	; Null descriptor
-	dw 0x0000
-	dw 0x0000
-	db 0x00
-	db 0x00
-	db 0x00
-	db 0x00
-GDT_code:
-	; Code descriptor
-	dw 0xffff
-	dw 0x0000
-	db 0x00
-	db 0x9a
-	db 0xcf
-	db 0x00
-GDT_data:
-	; Data descriptor
-	dw 0xffff
-	dw 0x0000
-	db 0x00
-	db 0x92
-	db 0xcf
-	db 0x00
-GDT_end:
+gdt_start:
+    dd 0, 0
+    dd 0x0000ffff
+    dd 0x00cf9a00
+    dd 0x0000ffff
+    dd 0x00cf9200
+    dd 0, 0
+    dd 0, 0
+gdt_end:
 
 ; Like a handle to the GDT
-GDT_descriptor:
-	dw GDT_end - GDT_start - 1
-	dd GDT_start
-
-CODE_SEG equ GDT_code - GDT_start
-DATA_SEG equ GDT_data - GDT_start
+gdt_descriptor:
+	dw gdt_end - gdt_start - 1
+	dd gdt_start
 
 [bits 32] ; We have 32 bits now!
 initProtected:
-	; Segment setup
-	mov ax, DATA_SEG
-	mov ds, ax
+    mov ax, 16
+    mov ds, ax
 	mov ss, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
 
-	; Stack setup
-	mov ebp, 0x7c00 ; Right below the bootloader
-	mov esp, ebp
+    mov esp, 0x2000 ; Set up a 32-bit stack
 
-	jmp 0x7e00 ; Go to the kernel :~)
+    jmp 0x10000 ; Jump to the kernel
 
-times 510-($-$$) db 0 ; Pad to 512 bytes (1 sector)
-dw 0xaa55             ; Magic number, marks this as bootable
+	; If we somehow get back here, hang the computer
+	cli
+    hlt
+
+times 510-($-$$) db 0 ; Make sure this is one sector (boot sector)
+dw 0xaa55             ; Magic 'bootable' marker :~)
