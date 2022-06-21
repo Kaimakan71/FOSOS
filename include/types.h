@@ -16,6 +16,8 @@ typedef byte UInt8;
 typedef word UInt16;
 typedef dword UInt32;
 
+typedef UInt32 Time;
+
 #define true 1
 #define false 0
 

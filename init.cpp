@@ -6,24 +6,31 @@
  */
 
 #include <types.h>
-#include <vga.h>
+#include <pic.h>
 #include <i386.h>
 #include <keyboard.h>
-#include <pic.h>
 #include <shell.h>
 
 void init() {
 	disableInterrupts();
 
+	// Initialize the Programmable Interrupt Controller
 	pic_init();
+
+	// Initialize cpu tables
 	gdt_init();
 	idt_init();
 
 	// Register interrupt handlers here :~)
 	keyboard_init();
 
+	// Initialize the Real-Time Clock
+	rtc_init();
+
+	// Initialize the shell
 	shell_init();
 
+	// Enable interrupts
 	enableInterrupts();
 
 	// Stay idle until an interrupt comes along

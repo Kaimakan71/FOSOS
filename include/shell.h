@@ -11,6 +11,7 @@
 #include <vga.h>
 #include <gui.h>
 #include <stdlib.h>
+#include <rtc.h>
 
 extern char shell_inbuf[64];
 extern UInt8 shell_inbufPos;

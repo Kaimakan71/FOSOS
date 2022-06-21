@@ -24,6 +24,12 @@ void banner() {
 	print("Copyright (c) 2022, the FOSOS developers.\n\n");
 }
 
+void shell_time() {
+	print("Current time is ");
+	rtc_printTime();
+	print("\n");
+}
+
 void shell_setUsername(const char* name) {
 	memset(&system.username, 0, sizeof(system.username));
 	strcpy(system.username, name);
@@ -51,6 +57,7 @@ void shell_handleInput() {
 	// Run command
 	if(streq(shell_inbuf, "help")) print("help   - prints this message\nclear  - clears the screen\nbanner - prints the FOSOS banner\ngui    - a broken WIP text UI demo\n");
 	else if(streq(shell_inbuf, "clear")) clearScreen();
+	else if(streq(shell_inbuf, "time")) shell_time();
 	else if(streq(shell_inbuf, "banner")) banner();
 	else if(streq(shell_inbuf, "gui")) gui_init();
 	else print("Unknown command '%s'\n", shell_inbuf);
@@ -72,8 +79,9 @@ void shell_init() {
 	shell_setUsername("kai");
 	shell_setHostname("native");
 
-	// Print banner and prompt
+	// Print banner, time, and prompt
 	banner();
+	shell_time();
 	print("Type 'help' for a list of commands and use ^c if you get stuck :-)\n");
 	shell_prompt();
 
