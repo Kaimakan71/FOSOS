@@ -7,7 +7,8 @@ OBJS = \
 	drivers/vga.o \
 	drivers/i386.o \
 	drivers/keyboard.o \
-	gui.o
+	gui.o \
+	shell.o
 
 all: build/disk.img
 

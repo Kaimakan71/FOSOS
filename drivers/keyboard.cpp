@@ -57,16 +57,6 @@ PRIVATE char kbdus_shift_map[0x100] = {
 
 PRIVATE byte kbd_modifiers;
 
-char inbuf[64];
-UInt8 inbuf_pos;
-
-void handleShellInput() {
-	if(streq(inbuf, "help")) print("help  - prints this message\nclear - clears the screen\ngui   - a broken WIP text UI demo\n");
-	else if(streq(inbuf, "clear")) clearScreen();
-	else if(streq(inbuf, "gui")) gui_init();
-	else print("Unknown command '%s'\n", inbuf);
-}
-
 void handleKeyboardInterrupt() {
 	IRQHandlerScope scope(IRQ_KEYBOARD);
 	while(inb(0x64) & 1) {
@@ -79,19 +69,7 @@ void handleKeyboardInterrupt() {
 			case 0x2A: kbd_modifiers |= KBD_MOD_SHIFT; break;
 			case 0xAA: kbd_modifiers &= ~KBD_MOD_SHIFT; break;
 			case 0xFA: /* i8042 ack */ break;
-			case 0x1C:
-				// Next line, print input, and prompt
-				print("\n");
-
-				handleShellInput();
-
-				print("> ");
-
-				// Empty shell input buffer
-				memset(inbuf, 0, sizeof(inbuf));
-				inbuf_pos = 0;
-
-				break;
+			case 0x1C: /* Ask the shell to handle the input */ shell_handleInput(); break;
 			default:
 				// Key depressed
 				if(ch & 0x80) break;
@@ -100,7 +78,7 @@ void handleKeyboardInterrupt() {
 				else if(kbd_modifiers & KBD_MOD_SHIFT) ch = kbdus_shift_map[ch];
 
 				putChar(ch);
-				inbuf[inbuf_pos++] = ch;
+				shell_inbuf[shell_inbufPos++] = ch;
 				vga_setCursor(vga_cursor);
 		}
 	}
@@ -112,10 +90,6 @@ void keyboard_init() {
 
 	// Empty the buffer of any pending data
 	while (inb(I8042_STATUS ) & DATA_AVAILABLE) inb(I8042_BUFFER);
-
-	// Empty shell input buffer
-	memset(inbuf, 0, sizeof(inbuf));
-	inbuf_pos = 0;
 
 	// Register our handler and enable it
 	registerInterruptHandler(IRQ_VECTOR_BASE + IRQ_KEYBOARD, keyboard_ISR);
