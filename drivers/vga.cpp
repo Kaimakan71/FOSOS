@@ -9,7 +9,7 @@
 
 PRIVATE byte *vga_mem = (byte*)0xb8000;
 PRIVATE byte vga_color = 0x07;
-volatile UInt16 vga_cursor;
+PUBLIC volatile UInt16 vga_cursor;
 
 PUBLIC byte vga_getColor() {
 	return vga_color;
@@ -40,8 +40,8 @@ PUBLIC void vga_setCursor(UInt16 value) {
 	outb(0x3d5, LSB(value));
 }
 
-PUBLIC void vga_setCursor(UInt8 row, UInt8 column) {
-	vga_setCursor(row * 80 + column);
+PUBLIC void vga_setCursor(UInt8 x, UInt8 y) {
+	vga_setCursor(y * 80 + x);
 }
 
 PUBLIC void putChar(char character) {
@@ -67,6 +67,23 @@ PUBLIC void putChar(char character) {
 		memcpy(vga_mem, vga_mem + 160, 160 * 23);
 		memset(vga_mem + (160 * 23), 0, 160);
 		vga_cursor = 23 * VGA_WIDTH;
+	}
+}
+
+PUBLIC void putCharAt(char character, UInt8 x, UInt8 y) {
+	UInt16 pos = (y * 160) + (x * 2);
+	vga_mem[pos] = character;
+	vga_mem[pos + 1] = vga_color;
+}
+
+PUBLIC void fillRect(UInt8 x, UInt8 y, UInt8 width, UInt8 height, byte color) {
+	for(UInt8 iy = 0; iy < height; iy++) {
+		UInt16 y_pos = (y + iy) * 160;
+		for(UInt8 ix = 0; ix < width; ix++) {
+			UInt16 pos = y_pos + (x + ix) * 2;
+			vga_mem[pos] = ' ';
+			vga_mem[pos + 1] = color;
+		}
 	}
 }
 
@@ -168,12 +185,10 @@ PUBLIC void print(const char *fmt, ...) {
 	vga_setCursor(vga_cursor);
 }
 
-PUBLIC void vga_init() {
-	dword i;
-
-	for( i = 0; i < VGA_CHARS; ++i ) {
+PUBLIC void clearScreen() {
+	for(UInt16 i = 0; i < VGA_CHARS; ++i) {
 		vga_mem[i*2] = ' ';
-		vga_mem[i*2 + 1] = 0x07;
+		vga_mem[i*2 + 1] = vga_color;
 	}
 
 	vga_setCursor(0);

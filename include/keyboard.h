@@ -13,6 +13,7 @@
 #include <vga.h>
 #include <pic.h>
 #include <stdlib.h>
+#include <gui.h>
 
 enum class KeyboardLED {
 	ScrollLock = 1 << 0,

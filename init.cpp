@@ -10,13 +10,19 @@
 #include <i386.h>
 #include <keyboard.h>
 #include <pic.h>
-#include <stdlib.h>
-#include <io.h>
+
+// Print a banner in a bright color
+void banner() {
+	vga_setColor(0x0f);
+	print("    dBBBBP dBBBBP.dBBBBP   dBBBBP.dBBBBP\n   dBP    dB'.BP BP       dB'.BP BP\n  dBBBP  dB'.BP  `BBBBb  dB'.BP  `BBBBb\n dBP    dB'.BP      dBP dB'.BP      dBP\ndBP    dBBBBP  dBBBBP' dBBBBP  dBBBBP'   v1.0\n\nType 'help' for a list of commands\n");
+	vga_setColor(0x07);
+}
 
 void init() {
 	disableInterrupts();
 
-	vga_init();
+	vga_setColor(0x07);
+	clearScreen();
 
 	pic_init();
 	gdt_init();
@@ -25,11 +31,7 @@ void init() {
 	// Register interrupt handlers here :~)
 	keyboard_init();
 
-	// Print a banner in a bright color
-	vga_setColor(0x0f);
-	print("    dBBBBP dBBBBP.dBBBBP   dBBBBP.dBBBBP\n   dBP    dB'.BP BP       dB'.BP BP\n  dBBBP  dB'.BP  `BBBBb  dB'.BP  `BBBBb\n dBP    dB'.BP      dBP dB'.BP      dBP\ndBP    dBBBBP  dBBBBP' dBBBBP  dBBBBP'   v1.0\n\n");
-	vga_setColor(0x07);
-
+	banner();
 	print("> ");
 
 	enableInterrupts();

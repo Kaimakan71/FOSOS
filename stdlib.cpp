@@ -22,7 +22,14 @@ UInt32 strlen(const char* str) {
 	return len;
 }
 
-int strcmp(const char *s1, const char *s2) {
+int strcmp(const char* s1, const char* s2) {
 	for(; *s1 == *s2; ++s1, ++s2) if(*s1 == 0) return 0;
 	return *(const byte*)s1 < *(const byte*)s2 ? -1 : 1;
+}
+
+// Checks for string equality
+// Does not care about which string is more/less, unlike strcmp()
+bool streq(const char* s1, const char* s2) {
+	for(; *s1 == *s2; ++s1, ++s2) if(*s1 == 0) return true;
+	return false;
 }
