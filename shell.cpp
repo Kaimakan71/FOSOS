@@ -36,11 +36,15 @@ void shell_handleInput() {
 }
 
 void shell_init() {
-	// Empty shell input buffer
-	memset(shell_inbuf, 0, sizeof(shell_inbuf));
-	shell_inbufPos = 0;
+	// Reset screen and color
+	vga_setColor(0x07);
+	clearScreen();
 
 	// Print banner and prompt
 	banner();
-	print("Type 'help' for a list of commands\n> ");
+	print("Type 'help' for a list of commands and use ^c if you get stuck :-)\n> ");
+
+	// Empty shell input buffer
+	memset(shell_inbuf, 0, sizeof(shell_inbuf));
+	shell_inbufPos = 0;
 }

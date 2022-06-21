@@ -15,9 +15,6 @@
 void init() {
 	disableInterrupts();
 
-	vga_setColor(0x07);
-	clearScreen();
-
 	pic_init();
 	gdt_init();
 	idt_init();

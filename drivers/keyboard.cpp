@@ -75,7 +75,11 @@ void handleKeyboardInterrupt() {
 				if(ch & 0x80) break;
 
 				if(!kbd_modifiers) ch = kbdus_map[ch];
-				else if(kbd_modifiers & KBD_MOD_SHIFT) ch = kbdus_shift_map[ch];
+				else if((kbd_modifiers & KBD_MOD_CTRL) && ch == 46) {
+					// ^c to return to shell!
+					shell_init();
+					break;
+				} else if(kbd_modifiers & KBD_MOD_SHIFT) ch = kbdus_shift_map[ch];
 
 				putChar(ch);
 				shell_inbuf[shell_inbufPos++] = ch;
