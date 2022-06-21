@@ -17,7 +17,7 @@ char shell_inbuf[64];
 UInt8 shell_inbufPos;
 
 // Print a banner in a bright color
-void banner() {
+void shell_banner() {
 	vga_setColor(0x0f);
 	print("    dBBBBP dBBBBP.dBBBBP   dBBBBP.dBBBBP\n   dBP    dB'.BP BP       dB'.BP BP\n  dBBBP  dB'.BP  `BBBBb  dB'.BP  `BBBBb\n dBP    dB'.BP      dBP dB'.BP      dBP\ndBP    dBBBBP  dBBBBP' dBBBBP  dBBBBP'   v1.0\n");
 	vga_setColor(0x07);
@@ -25,7 +25,6 @@ void banner() {
 }
 
 void shell_time() {
-	print("Current time is ");
 	rtc_printTime();
 	print("\n");
 }
@@ -55,10 +54,12 @@ void shell_handleInput() {
 	print("\n");
 
 	// Run command
-	if(streq(shell_inbuf, "help")) print("help   - prints this message\nclear  - clears the screen\nbanner - prints the FOSOS banner\ngui    - a broken WIP text UI demo\n");
+	if(streq(shell_inbuf, "help")) print("help     - prints this message\nclear    - clears the screen\ntime     - prints the current time\nwhoami   - prints your username\nhostname - prints the machine's hostname\nbanner   - prints the FOSOS banner\ngui      - a broken WIP text UI demo\n");
 	else if(streq(shell_inbuf, "clear")) clearScreen();
 	else if(streq(shell_inbuf, "time")) shell_time();
-	else if(streq(shell_inbuf, "banner")) banner();
+	else if(streq(shell_inbuf, "whoami")) print("%s\n", system.username);
+	else if(streq(shell_inbuf, "hostname")) print("%s\n", system.hostname);
+	else if(streq(shell_inbuf, "banner")) shell_banner();
 	else if(streq(shell_inbuf, "gui")) gui_init();
 	else print("Unknown command '%s'\n", shell_inbuf);
 
@@ -80,7 +81,8 @@ void shell_init() {
 	shell_setHostname("native");
 
 	// Print banner, time, and prompt
-	banner();
+	shell_banner();
+	print("Hello, %s! Current time is ", system.username);
 	shell_time();
 	print("Type 'help' for a list of commands and use ^c if you get stuck :-)\n");
 	shell_prompt();
