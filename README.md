@@ -1,6 +1,9 @@
 # FOSOS
 A simple command-line operating system base for developers written in C-styled C++. It provides a simple but strong base to build your OS on top of, with a simple and permissive [BSD 2-Clause license](https://github.com/Kaimakan71/FOSOS/blob/main/LICENSE).
 
+## Screenshot
+![FOSOS Screenshot](https://github.com/Kaimakan71/FOSOS/blob/main/screenshot.png)
+
 ## Authors
 * Creator & main development - [Kaimakan71](https://github.com/Kaimakan71)
 * C bug help :~) - [CoherenceLabs](https://github.com/CoherenceLabs)
