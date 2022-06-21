@@ -69,7 +69,19 @@ void handleKeyboardInterrupt() {
 			case 0x2A: kbd_modifiers |= KBD_MOD_SHIFT; break;
 			case 0xAA: kbd_modifiers &= ~KBD_MOD_SHIFT; break;
 			case 0xFA: /* i8042 ack */ break;
-			case 0x1C: /* Ask the shell to handle the input */ shell_handleInput(); break;
+			case 0x1C: /* Enter pressed, notify shell */ shell_handleInput(); break;
+			case 0x0E:
+				// If at start of line, ignore keypress
+				if(shell_inbufPos == 0) break;
+
+				// Move the cursor back and clear the character from display and input buffer
+				vga_cursor--;
+				shell_inbufPos--;
+				vga_setCursor(vga_cursor);
+				clearChar(vga_cursor);
+				shell_inbuf[shell_inbufPos] = 0;
+
+				break;
 			default:
 				// Key depressed
 				if(ch & 0x80) break;
