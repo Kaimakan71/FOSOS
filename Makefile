@@ -3,7 +3,6 @@ OBJS = \
 	init.o \
 	stdlib.o \
 	io.o \
-	gui.o \
 	shell.o \
 	drivers/pic.o \
 	drivers/vga.o \
@@ -11,6 +10,8 @@ OBJS = \
 	drivers/keyboard.o \
 	drivers/pit.o \
 	drivers/rtc.o
+
+# 	gui.o \
 
 all: build/disk.img
 

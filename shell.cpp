@@ -52,7 +52,7 @@ void shell_handleInput() {
 
 	// Run command
 	if(strlen(shell_inbuf) == 0); // Ignore empty lines
-	else if(streq(shell_inbuf, "help")) print("help     - prints this message\nclear    - clears the screen\ntime     - prints the current time\nwhoami   - prints your username\nhostname - prints the machine's hostname\nuptime   - prints the system's current uptime\nbanner   - prints the FOSOS banner\ngui      - a WIP text UI demo\n");
+	else if(streq(shell_inbuf, "help")) print("help     - prints this message\nclear    - clears the screen\ntime     - prints the current time\nwhoami   - prints your username\nhostname - prints the machine's hostname\nuptime   - prints the system's current uptime\nbanner   - prints the FOSOS banner\n");
 	else if(streq(shell_inbuf, "clear")) clearScreen();
 	else if(streq(shell_inbuf, "time")) shell_time();
 	else if(streq(shell_inbuf, "whoami")) print("%s\n", system.username);
@@ -65,8 +65,8 @@ void shell_handleInput() {
 			seconds % 60 // Remainder of seconds after /60
 		);
 	} else if(streq(shell_inbuf, "banner")) shell_banner();
-	else if(streq(shell_inbuf, "gui")) gui_init();
 	else print("Unknown command '%s'\n", shell_inbuf);
+	// else if(streq(shell_inbuf, "gui")) gui_init();
 
 	// Prompt
 	shell_prompt();

@@ -9,7 +9,7 @@
 
 #include <types.h>
 #include <vga.h>
-#include <gui.h>
+// #include <gui.h>
 #include <stdlib.h>
 #include <rtc.h>
 
