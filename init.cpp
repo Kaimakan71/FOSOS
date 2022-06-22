@@ -9,6 +9,7 @@
 #include <pic.h>
 #include <i386.h>
 #include <keyboard.h>
+#include <pit.h>
 #include <shell.h>
 
 void init() {
@@ -23,6 +24,7 @@ void init() {
 
 	// Register interrupt handlers here :~)
 	keyboard_init();
+	pit_init();
 
 	// Initialize the Real-Time Clock
 	rtc_init();

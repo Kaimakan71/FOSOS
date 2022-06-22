@@ -54,8 +54,7 @@ PUBLIC void putChar(char character) {
 				memcpy(vga_mem, vga_mem + 160, 160 * 23);
 				memset(vga_mem + (160 * 23), 0, 160);
 				vga_cursor = row * VGA_WIDTH;
-			} else
-				vga_cursor = (row + 1) * VGA_WIDTH;
+			} else vga_cursor = (row + 1) * VGA_WIDTH;
 			return;
 		default:
 			vga_mem[vga_cursor * 2] = character;
@@ -137,6 +136,7 @@ PUBLIC void print(const char *fmt, ...) {
 			++p;
 			switch(*p) {
 				case 's':
+					// String
 					{
 						const char* sp = va_arg(ap, const char*);
 						//ASSERT(sp != nullptr);
@@ -149,30 +149,31 @@ PUBLIC void print(const char *fmt, ...) {
 						} else for(; *sp; ++sp) putChar(*sp);
 					}
 					break;
+
 				case 'd':
 					printSignedNumber(va_arg(ap, int));
 					break;
 
 				case 'u':
-					printNum(va_arg( ap, dword ));
+					printNum(va_arg(ap, dword));
 					break;
 
 				case 'x':
-					printHex(va_arg( ap, dword ), 8);
+					printHex(va_arg(ap, dword), 8);
 					break;
 
 				case 'b':
-					printHex(va_arg( ap, int ), 2);
+					printHex(va_arg(ap, int), 2);
 					break;
 
 				case 'c':
-					putChar((char)va_arg( ap, int ));
+					putChar((char)va_arg(ap, int));
 					break;
 
 				case 'p':
 					putChar('0');
 					putChar('x');
-					printHex(va_arg( ap, dword ), 8);
+					printHex(va_arg(ap, dword), 8);
 					break;
 			}
 		}

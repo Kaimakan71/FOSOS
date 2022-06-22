@@ -6,11 +6,8 @@
  */
 
 #include <shell.h>
+#include <pit.h>
 
-typedef struct {
-	char username[32];
-	char hostname[32];
-} System;
 System system;
 
 char shell_inbuf[64];
@@ -54,12 +51,20 @@ void shell_handleInput() {
 	print("\n");
 
 	// Run command
-	if(streq(shell_inbuf, "help")) print("help     - prints this message\nclear    - clears the screen\ntime     - prints the current time\nwhoami   - prints your username\nhostname - prints the machine's hostname\nbanner   - prints the FOSOS banner\ngui      - a broken WIP text UI demo\n");
+	if(strlen(shell_inbuf) == 0); // Ignore empty lines
+	else if(streq(shell_inbuf, "help")) print("help     - prints this message\nclear    - clears the screen\ntime     - prints the current time\nwhoami   - prints your username\nhostname - prints the machine's hostname\nuptime   - prints the system's current uptime\nbanner   - prints the FOSOS banner\ngui      - a WIP text UI demo\n");
 	else if(streq(shell_inbuf, "clear")) clearScreen();
 	else if(streq(shell_inbuf, "time")) shell_time();
 	else if(streq(shell_inbuf, "whoami")) print("%s\n", system.username);
 	else if(streq(shell_inbuf, "hostname")) print("%s\n", system.hostname);
-	else if(streq(shell_inbuf, "banner")) shell_banner();
+	else if(streq(shell_inbuf, "uptime")) {
+		UInt32 seconds = system.uptime / TICKS_PER_SECOND;
+		print(
+			"%um %us\n",
+			seconds / 60, // Seconds / 60, rounded down
+			seconds % 60 // Remainder of seconds after /60
+		);
+	} else if(streq(shell_inbuf, "banner")) shell_banner();
 	else if(streq(shell_inbuf, "gui")) gui_init();
 	else print("Unknown command '%s'\n", shell_inbuf);
 
@@ -79,12 +84,13 @@ void shell_init() {
 	// Set system defaults
 	shell_setUsername("kai");
 	shell_setHostname("native");
+	system.uptime = 0;
 
 	// Print banner, time, and prompt
 	shell_banner();
 	print("Hello, %s! Current time is ", system.username);
 	shell_time();
-	print("Type 'help' for a list of commands and use ^c if you get stuck :-)\n");
+	print("Type 'help' for a list of commands and use ctrl+c if you get stuck :-)\n");
 	shell_prompt();
 
 	// Empty shell input buffer

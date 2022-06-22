@@ -58,7 +58,6 @@ PRIVATE char kbdus_shift_map[0x100] = {
 PRIVATE byte kbd_modifiers;
 
 void handleKeyboardInterrupt() {
-	IRQHandlerScope scope(IRQ_KEYBOARD);
 	while(inb(0x64) & 1) {
 		byte ch = inb(0x60);
 		switch (ch) {
@@ -98,6 +97,7 @@ void handleKeyboardInterrupt() {
 				vga_setCursor(vga_cursor);
 		}
 	}
+	pic_eoi(IRQ_KEYBOARD);
 }
 
 void keyboard_init() {
