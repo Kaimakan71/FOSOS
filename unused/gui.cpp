@@ -28,7 +28,7 @@ PRIVATE void messageBox(const char* title, const char* text) {
 	UInt8 x = VGA_MIDDLE_X - (width / 2);
 	UInt8 y = VGA_MIDDLE_Y - MESSAGEBOX_MIDDLE;
 
-	vga_setColor(0xf0);
+	VGA::setColor(0xf0);
 
 	// Shadow
 	fillRect(x, y, width , MESSAGEBOX_HEIGHT, 0x00);
@@ -36,16 +36,16 @@ PRIVATE void messageBox(const char* title, const char* text) {
 	fillRect(x - 1, y - 1, width, MESSAGEBOX_HEIGHT, 0xf0);
 
 	// Title
-	vga_setCursor(x, y - 1);
+	VGA::setCursor(x, y - 1);
 	print(title);
 
 	// Message text
-	vga_setCursor(x + 2, y + 1);
+	VGA::setCursor(x + 2, y + 1);
 	print(text);
 }
 
 PUBLIC void gui_init() {
-	vga_setColor(0x90);
+	VGA::setColor(0x90);
 	clearScreen();
 	messageBox("About FOSOS", "FOSOS version 1.0");
 }

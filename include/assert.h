@@ -10,5 +10,5 @@
 #include <types.h>
 #include <vga.h>
 
-#define ASSERT(x) if(!(x)) { vga_setColor(0x4f); print("ASSERTION " #x " FAILED IN %s:%u (%s)\n", __FILE__, __LINE__, __PRETTY_FUNCTION__); HANG; }
+#define ASSERT(x) if(!(x)) { VGA::setColor(0x4f); print("ASSERTION " #x " FAILED IN %s:%u (%s)\n", __FILE__, __LINE__, __PRETTY_FUNCTION__); hang(); }
 #define ASSERT_UNREACHABLE() ASSERT(false)

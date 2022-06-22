@@ -7,19 +7,21 @@
 
 #include <vga.h>
 
-PRIVATE byte *vga_mem = (byte*)0xb8000;
-PRIVATE byte vga_color = 0x07;
-PUBLIC volatile UInt16 vga_cursor;
+namespace VGA {
 
-PUBLIC byte vga_getColor() {
-	return vga_color;
+byte *mem = (byte*)0xb8000;
+byte color = 0x07;
+volatile UInt16 cursor;
+
+byte getColor() {
+	return color;
 }
 
-PUBLIC void vga_setColor(byte color) {
-	vga_color = color;
+void setColor(byte newColor) {
+	color = newColor;
 }
 
-PUBLIC UInt16 vga_getCursor() {
+UInt16 getCursor() {
 	word value;
 	outb(0x3d4, 0x0e);
 	value = inb(0x3d5) << 8;
@@ -28,10 +30,10 @@ PUBLIC UInt16 vga_getCursor() {
 	return value;
 }
 
-PUBLIC void vga_setCursor(UInt16 value) {
+void setCursor(UInt16 value) {
 	if(value >= VGA_CHARS) {
-		vga_setCursor(0);
-		vga_color = 0x0c;
+		setCursor(0);
+		color = 0x0c;
 		return;
 	}
 	outb(0x3d4, 0x0e);
@@ -40,57 +42,11 @@ PUBLIC void vga_setCursor(UInt16 value) {
 	outb(0x3d5, LSB(value));
 }
 
-PUBLIC void vga_setCursor(UInt8 x, UInt8 y) {
-	vga_setCursor(y * 80 + x);
+void setCursor(UInt8 x, UInt8 y) {
+	setCursor(y * 80 + x);
 }
 
-PUBLIC void putChar(char character) {
-	UInt16 row;
-
-	switch(character) {
-		case '\n':
-			row = vga_cursor / VGA_WIDTH;
-			if(row == 23) {
-				memcpy(vga_mem, vga_mem + 160, 160 * 23);
-				memset(vga_mem + (160 * 23), 0, 160);
-				vga_cursor = row * VGA_WIDTH;
-			} else vga_cursor = (row + 1) * VGA_WIDTH;
-			return;
-		default:
-			vga_mem[vga_cursor * 2] = character;
-			vga_mem[vga_cursor * 2 + 1] = vga_color;
-			vga_cursor++;
-	}
-	row = vga_cursor / VGA_WIDTH;
-	if(row >= 24) {
-		memcpy(vga_mem, vga_mem + 160, 160 * 23);
-		memset(vga_mem + (160 * 23), 0, 160);
-		vga_cursor = 23 * VGA_WIDTH;
-	}
-}
-
-PUBLIC void putCharAt(char character, UInt8 x, UInt8 y) {
-	UInt16 pos = (y * 160) + (x * 2);
-	vga_mem[pos] = character;
-	vga_mem[pos + 1] = vga_color;
-}
-
-PUBLIC void fillRect(UInt8 x, UInt8 y, UInt8 width, UInt8 height, byte color) {
-	for(UInt8 iy = 0; iy < height; iy++) {
-		UInt16 y_pos = (y + iy) * 160;
-		for(UInt8 ix = 0; ix < width; ix++) {
-			UInt16 pos = y_pos + (x + ix) * 2;
-			vga_mem[pos] = ' ';
-			vga_mem[pos + 1] = color;
-		}
-	}
-}
-
-PUBLIC void clearChar(UInt16 index) {
-	vga_mem[index * 2] = ' ';
-}
-
-PRIVATE void printHex(UInt32 number, UInt8 fields) {
+void printHex(UInt32 number, UInt8 fields) {
 	byte shr_count = fields * 4;
 	while(shr_count) {
 		shr_count -= 4;
@@ -98,7 +54,7 @@ PRIVATE void printHex(UInt32 number, UInt8 fields) {
 	}
 }
 
-PRIVATE void printNum(UInt32 number) {
+void printNum(UInt32 number) {
 	dword divisor = 1000000000;
 	char character;
 	char padding = 1;
@@ -116,18 +72,75 @@ PRIVATE void printNum(UInt32 number) {
 	}
 }
 
-PRIVATE void printSignedNumber(int number) {
+void printSignedNumber(int number) {
 	if(number < 0) {
 		putChar('-');
 		printNum(0 - number);
 	} else printNum(number);
 }
 
-PUBLIC void print(const char *fmt, ...) {
+void clearScreen() {
+	for(UInt16 i = 0; i < VGA_CHARS; ++i) {
+		mem[i*2] = ' ';
+		mem[i*2 + 1] = color;
+	}
+
+	setCursor(0);
+}
+
+};
+
+void putChar(char character) {
+	UInt16 row;
+
+	switch(character) {
+		case '\n':
+			row = VGA::cursor / VGA_WIDTH;
+			if(row == 23) {
+				memcpy(VGA::mem, VGA::mem + 160, 160 * 23);
+				memset(VGA::mem + (160 * 23), 0, 160);
+				VGA::cursor = row * VGA_WIDTH;
+			} else VGA::cursor = (row + 1) * VGA_WIDTH;
+			return;
+		default:
+			VGA::mem[VGA::cursor * 2] = character;
+			VGA::mem[VGA::cursor * 2 + 1] = VGA::color;
+			VGA::cursor++;
+	}
+	row = VGA::cursor / VGA_WIDTH;
+	if(row >= 24) {
+		memcpy(VGA::mem, VGA::mem + 160, 160 * 23);
+		memset(VGA::mem + (160 * 23), 0, 160);
+		VGA::cursor = 23 * VGA_WIDTH;
+	}
+}
+
+void putCharAt(char character, UInt8 x, UInt8 y) {
+	UInt16 pos = (y * 160) + (x * 2);
+	VGA::mem[pos] = character;
+	VGA::mem[pos + 1] = VGA::color;
+}
+
+void fillRect(UInt8 x, UInt8 y, UInt8 width, UInt8 height, byte color) {
+	for(UInt8 iy = 0; iy < height; iy++) {
+		UInt16 y_pos = (y + iy) * 160;
+		for(UInt8 ix = 0; ix < width; ix++) {
+			UInt16 pos = y_pos + (x + ix) * 2;
+			VGA::mem[pos] = ' ';
+			VGA::mem[pos + 1] = color;
+		}
+	}
+}
+
+void clearChar(UInt16 index) {
+	VGA::mem[index * 2] = ' ';
+}
+
+void print(const char *fmt, ...) {
 	const char *p;
 	va_list ap;
 
-	vga_cursor = vga_getCursor();
+	VGA::cursor = VGA::getCursor();
 
 	va_start( ap, fmt );
 
@@ -151,19 +164,19 @@ PUBLIC void print(const char *fmt, ...) {
 					break;
 
 				case 'd':
-					printSignedNumber(va_arg(ap, int));
+					VGA::printSignedNumber(va_arg(ap, int));
 					break;
 
 				case 'u':
-					printNum(va_arg(ap, dword));
+					VGA::printNum(va_arg(ap, dword));
 					break;
 
 				case 'x':
-					printHex(va_arg(ap, dword), 8);
+					VGA::printHex(va_arg(ap, dword), 8);
 					break;
 
 				case 'b':
-					printHex(va_arg(ap, int), 2);
+					VGA::printHex(va_arg(ap, int), 2);
 					break;
 
 				case 'c':
@@ -173,7 +186,7 @@ PUBLIC void print(const char *fmt, ...) {
 				case 'p':
 					putChar('0');
 					putChar('x');
-					printHex(va_arg(ap, dword), 8);
+					VGA::printHex(va_arg(ap, dword), 8);
 					break;
 			}
 		}
@@ -183,14 +196,5 @@ PUBLIC void print(const char *fmt, ...) {
 	va_end(ap);
 
 	// Update the cursor
-	vga_setCursor(vga_cursor);
-}
-
-PUBLIC void clearScreen() {
-	for(UInt16 i = 0; i < VGA_CHARS; ++i) {
-		vga_mem[i*2] = ' ';
-		vga_mem[i*2 + 1] = vga_color;
-	}
-
-	vga_setCursor(0);
+	VGA::setCursor(VGA::cursor);
 }

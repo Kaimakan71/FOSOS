@@ -22,7 +22,7 @@ static word s_gdtLength;
 #define EH(i, msg) \
 	static void _exception ## i () \
 	{ \
-		vga_setColor(0x0a); \
+		VGA::setColor(0x0a); \
 		print(msg"\n"); \
 		dword cr0, cr2, cr3, cr4; \
 		asm ("movl %%cr0, %%eax":"=a"(cr0)); \
@@ -30,7 +30,7 @@ static word s_gdtLength;
 		asm ("movl %%cr3, %%eax":"=a"(cr3)); \
 		asm ("movl %%cr4, %%eax":"=a"(cr4)); \
 		print("CR0=%x CR2=%x CR3=%x CR4=%x\n", cr0, cr2, cr3, cr4); \
-		HANG; \
+		hang(); \
 	}
 
 EH(0, "Divide error")
@@ -53,7 +53,7 @@ EH(16, "Coprocessor error")
 
 static void unimp_trap() {
 	print("Unhandled IRQ");
-	HANG;
+	hang();
 }
 
 namespace GDT {

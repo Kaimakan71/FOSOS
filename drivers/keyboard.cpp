@@ -96,10 +96,10 @@ void handle_keyboard() {
 				if(Shell::inbufPos == 0) break;
 
 				// Move the cursor back and clear the character from display and input buffer
-				vga_cursor--;
+				VGA::cursor--;
 				Shell::inbufPos--;
-				vga_setCursor(vga_cursor);
-				clearChar(vga_cursor);
+				VGA::setCursor(VGA::cursor);
+				clearChar(VGA::cursor);
 				Shell::inbuf[Shell::inbufPos] = 0;
 
 				break;
@@ -116,7 +116,7 @@ void handle_keyboard() {
 
 				putChar(character);
 				Shell::inbuf[Shell::inbufPos++] = character;
-				vga_setCursor(vga_cursor);
+				VGA::setCursor(VGA::cursor);
 		}
 	}
 	PIC::eoi(IRQ_KEYBOARD);

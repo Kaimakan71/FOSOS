@@ -17,17 +17,17 @@ UInt8 inbufPos;
 
 void prompt() {
 	print("\n");
-	vga_setColor(0x0a);
+	VGA::setColor(0x0a);
 	print(system.username);
-	vga_setColor(0x07);
+	VGA::setColor(0x07);
 	print("@");
-	vga_setColor(0x0f);
+	VGA::setColor(0x0f);
 	print(system.hostname);
-	vga_setColor(0x07);
+	VGA::setColor(0x07);
 	print(":");
-	vga_setColor(0x0b);
+	VGA::setColor(0x0b);
 	print(system.path);
-	vga_setColor(0x07);
+	VGA::setColor(0x07);
 	print("> ");
 }
 
@@ -47,9 +47,9 @@ void help() {
 
 // Print a banner in a bright color
 void banner() {
-	vga_setColor(0x0f);
+	VGA::setColor(0x0f);
 	print("    dBBBBP dBBBBP.dBBBBP   dBBBBP.dBBBBP\n   dBP    dB'.BP BP       dB'.BP BP\n  dBBBP  dB'.BP  `BBBBb  dB'.BP  `BBBBb\n dBP    dB'.BP      dBP dB'.BP      dBP\ndBP    dBBBBP  dBBBBP' dBBBBP  dBBBBP'   v1.0\n");
-	vga_setColor(0x07);
+	VGA::setColor(0x07);
 	print("Copyright (c) 2022, the FOSOS developers.\n\n");
 }
 
@@ -60,7 +60,7 @@ void handleInput() {
 	if(strlen(inbuf) == 0); // Ignore empty lines
 	else if(streq(inbuf, "help")) help();
 	else if(streq(inbuf, "pwd")) print(system.path);
-	else if(streq(inbuf, "clear")) clearScreen();
+	else if(streq(inbuf, "clear")) VGA::clearScreen();
 	else if(streq(inbuf, "date")) RTC::printTime();
 	else if(streq(inbuf, "uptime")) {
 		UInt32 seconds = system.uptime / TICKS_PER_SECOND;
@@ -79,8 +79,8 @@ void handleInput() {
 
 void reset() {
 	// Reset screen and color
-	vga_setColor(0x07);
-	clearScreen();
+	VGA::setColor(0x07);
+	VGA::clearScreen();
 
 	// Print banner, time, and prompt
 	banner();
