@@ -15,19 +15,17 @@
 void init() {
 	disableInterrupts();
 
-	// Initialize the Programmable Interrupt Controller
-	PIC::init();
+	// Initialize the Real-Time Clock
+	RTC::init();
 
-	// Initialize cpu tables
+	// Initialize the Programmable Interrupt Controller and CPU tables
+	PIC::init();
 	GDT::init();
 	IDT::init();
 
 	// Register interrupt handlers here :~)
 	Keyboard::init();
 	PIT::init();
-
-	// Initialize the Real-Time Clock
-	RTC::init();
 
 	// Initialize the shell
 	Shell::init();
