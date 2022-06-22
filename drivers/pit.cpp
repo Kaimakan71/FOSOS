@@ -11,8 +11,8 @@ extern "C" void tick_isr();
 extern "C" void handle_clock();
 
 asm(
-	".globl tick_isr \n"
-	"tick_isr: \n"
+	".globl tick_isr\n"
+	"tick_isr:\n"
 	"    pusha\n"
 	"    pushw %ds\n"
 	"    pushw %es\n"

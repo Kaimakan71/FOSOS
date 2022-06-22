@@ -8,6 +8,7 @@ void memcpy(void *dest, const void *src, UInt32 n) {
 
 void strcpy(char* dest, const char *src) {
 	while(*src) *(dest++) = *(src++);
+	*(dest++) = '\0';
 }
 
 void* memset(void* dest, byte c, UInt32 n) {

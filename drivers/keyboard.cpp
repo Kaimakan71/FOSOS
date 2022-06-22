@@ -16,13 +16,13 @@
 #define I8042_ACK 0xFA
 
 extern "C" void handleKeyboardInterrupt();
-extern "C" void keyboard_ISR();
+extern "C" void keyboard_isr();
 
 static byte kbd_ledState;
 
 asm(
-	".globl keyboard_ISR \n"
-	"keyboard_ISR: \n"
+	".globl keyboard_isr\n"
+	"keyboard_isr:\n"
 	"    pusha\n"
 	"    pushw %ds\n"
 	"    pushw %es\n"
@@ -87,8 +87,8 @@ void handleKeyboardInterrupt() {
 
 				if(!kbd_modifiers) ch = kbdus_map[ch];
 				else if((kbd_modifiers & KBD_MOD_CTRL) && ch == 46) {
-					// ^c to return to shell!
-					shell_init();
+					// Reset the shell
+					shell_reset();
 					break;
 				} else if(kbd_modifiers & KBD_MOD_SHIFT) ch = kbdus_shift_map[ch];
 
@@ -108,7 +108,7 @@ void keyboard_init() {
 	while (inb(I8042_STATUS ) & DATA_AVAILABLE) inb(I8042_BUFFER);
 
 	// Register our handler and enable it
-	registerInterruptHandler(IRQ_VECTOR_BASE + IRQ_KEYBOARD, keyboard_ISR);
+	registerInterruptHandler(IRQ_VECTOR_BASE + IRQ_KEYBOARD, keyboard_isr);
 	pic_enable(IRQ_KEYBOARD);
 }
 

@@ -21,19 +21,9 @@ void shell_banner() {
 	print("Copyright (c) 2022, the FOSOS developers.\n\n");
 }
 
-void shell_time() {
+void shell_date() {
 	rtc_printTime();
 	print("\n");
-}
-
-void shell_setUsername(const char* name) {
-	memset(&system.username, 0, sizeof(system.username));
-	strcpy(system.username, name);
-}
-
-void shell_setHostname(const char* name) {
-	memset(&system.hostname, 0, sizeof(system.hostname));
-	strcpy(system.hostname, name);
 }
 
 void shell_prompt() {
@@ -44,6 +34,10 @@ void shell_prompt() {
 	vga_setColor(0x0f);
 	print(system.hostname);
 	vga_setColor(0x07);
+	print(":");
+	vga_setColor(0x0b);
+	print(system.path);
+	vga_setColor(0x07);
 	print("> ");
 }
 
@@ -52,9 +46,11 @@ void shell_handleInput() {
 
 	// Run command
 	if(strlen(shell_inbuf) == 0); // Ignore empty lines
-	else if(streq(shell_inbuf, "help")) print("help     - prints this message\nclear    - clears the screen\ntime     - prints the current time\nwhoami   - prints your username\nhostname - prints the machine's hostname\nuptime   - prints the system's current uptime\nbanner   - prints the FOSOS banner\n");
+	else if(streq(shell_inbuf, "help")) print("help     - prints this message\npwd      - prints the current working directory\nide      - a simple IDE ATA disk driver test\nclear    - clears the screen\ndate     - prints the current date and time\nwhoami   - prints your username\nhostname - prints the machine's hostname\nuptime   - prints the system's current uptime\nbanner   - prints the FOSOS banner\n");
+	else if(streq(shell_inbuf, "pwd")) print("%s\n", system.path);
 	else if(streq(shell_inbuf, "clear")) clearScreen();
-	else if(streq(shell_inbuf, "time")) shell_time();
+	else if(streq(shell_inbuf, "ide")) ide_init();
+	else if(streq(shell_inbuf, "date")) shell_date();
 	else if(streq(shell_inbuf, "whoami")) print("%s\n", system.username);
 	else if(streq(shell_inbuf, "hostname")) print("%s\n", system.hostname);
 	else if(streq(shell_inbuf, "uptime")) {
@@ -76,24 +72,30 @@ void shell_handleInput() {
 	shell_inbufPos = 0;
 }
 
-void shell_init() {
+void shell_reset() {
 	// Reset screen and color
 	vga_setColor(0x07);
 	clearScreen();
 
-	// Set system defaults
-	shell_setUsername("kai");
-	shell_setHostname("native");
-	system.uptime = 0;
-
 	// Print banner, time, and prompt
 	shell_banner();
-	print("Hello, %s! Current time is ", system.username);
-	shell_time();
+	print("%uKiB base memory\nHello, %s! Current time is ", system.memory, system.username);
+	shell_date();
 	print("Type 'help' for a list of commands and use ctrl+c if you get stuck :-)\n");
 	shell_prompt();
 
 	// Empty shell input buffer
 	memset(shell_inbuf, 0, sizeof(shell_inbuf));
 	shell_inbufPos = 0;
+}
+
+void shell_init() {
+	// Set system defaults
+	strcpy(system.username, "kai");
+	strcpy(system.hostname, "native");
+	strcpy(system.path, "/");
+	system.uptime = 0;
+	system.memory = (cmos_read(0x16) << 8) | cmos_read(0x15);
+
+	shell_reset();
 }
