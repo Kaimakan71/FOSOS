@@ -14,13 +14,28 @@
 #include <pic.h>
 #include <shell.h>
 
-enum class KeyboardLED {
+#define IRQ_KEYBOARD 1
+
+#define I8042_BUFFER   0x60
+#define I8042_STATUS   0x64
+#define SET_LEDS       0xED
+#define DATA_AVAILABLE 0x01
+#define I8042_ACK      0xFA
+
+#define KBD_MOD_SHIFT 0x04
+#define KBD_MOD_CTRL  0x02
+#define KBD_MOD_ALT   0x01
+
+namespace Keyboard {
+
+enum class LED {
 	ScrollLock = 1 << 0,
 	NumLock = 1 << 1,
 	CapsLock = 1 << 2,
 };
 
-void keyboard_setLED(enum KeyboardLED led);
-void keyboard_unsetLED(enum KeyboardLED led);
-void keyboard_handleInterrupt();
-void keyboard_init();
+void setLED(enum LED led);
+void unsetLED(enum LED led);
+void init();
+
+};

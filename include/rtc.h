@@ -11,5 +11,9 @@
 #include <io.h>
 #include <vga.h>
 
-void rtc_printTime();
-void rtc_init();
+namespace RTC {
+
+void printTime();
+void init();
+
+};

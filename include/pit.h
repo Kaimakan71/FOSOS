@@ -31,4 +31,8 @@
 #define BASE_FREQ 1193182
 #define TICKS_PER_SECOND 600
 
-void pit_init();
+namespace PIT {
+
+void init();
+
+};

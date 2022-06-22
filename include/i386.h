@@ -61,18 +61,28 @@ union Descriptor {
 	}
 } PACKED;
 
-void gdt_init();
-void idt_init();
-void registerInterruptHandler(UInt8 vector, void (*f)());
-void registerUserCallableInterruptHandler(UInt8 vector, void (*f)());
-void flushIDT();
-void flushGDT();
-void loadTaskRegister(UInt16 selector);
-word allocateGDTEntry();
-Descriptor& getGDTEntry(UInt16 selector);
-void writeGDTEntry(UInt16 selector, Descriptor&);
+namespace GDT {
 
+word allocateEntry();
+void writeEntry(UInt16 selector, Descriptor&);
+Descriptor& getEntry(UInt16 selector);
+void flush();
+void init();
+
+};
+
+namespace IDT {
+
+void flush();
+void init();
+
+};
+
+void registerInterruptHandler(UInt8 vector, void (*f)());
+void registerUserInterruptHandler(UInt8 vector, void (*f)());
+
+#define loadTaskRegister(selector) asm volatile("ltr %0"::"r"(selector));
 #define disableInterrupts() asm volatile("cli");
 #define enableInterrupts() asm volatile("sti");
 
-#define IRQ_VECTOR_BASE 0x50
+#define IRQ_VECTOR_BASE 0x20

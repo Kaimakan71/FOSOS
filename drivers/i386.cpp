@@ -19,13 +19,6 @@ static Descriptor s_gdt[256];
 
 static word s_gdtLength;
 
-word allocateGDTEntry() {
-	ASSERT(s_gdtLength < 256);
-	word newGDTEntry = s_gdtLength * 8;
-	s_gdtLength++;
-	return newGDTEntry;
-}
-
 #define EH(i, msg) \
 	static void _exception ## i () \
 	{ \
@@ -58,7 +51,21 @@ EH(14, "Page fault")
 EH(15, "Unknown error")
 EH(16, "Coprocessor error")
 
-static void writeRawGDTEntry(UInt16 selector, UInt32 low, UInt32 high) {
+static void unimp_trap() {
+	print("Unhandled IRQ");
+	HANG;
+}
+
+namespace GDT {
+
+word allocateEntry() {
+	ASSERT(s_gdtLength < 256);
+	word newGDTEntry = s_gdtLength * 8;
+	s_gdtLength++;
+	return newGDTEntry;
+}
+
+static void writeRawEntry(UInt16 selector, UInt32 low, UInt32 high) {
 	UInt16 i = (selector & 0xfffc) >> 3;
 	s_gdt[i].low = low;
 	s_gdt[i].high = high;
@@ -68,56 +75,37 @@ static void writeRawGDTEntry(UInt16 selector, UInt32 low, UInt32 high) {
 	}
 }
 
-void writeGDTEntry(UInt16 selector, Descriptor& descriptor) {
-	writeRawGDTEntry(selector, descriptor.low, descriptor.high);
+void writeEntry(UInt16 selector, Descriptor& descriptor) {
+	writeRawEntry(selector, descriptor.low, descriptor.high);
 }
 
-Descriptor& getGDTEntry(UInt16 selector) {
+Descriptor& getEntry(UInt16 selector) {
 	UInt16 i = (selector & 0xfffc) >> 3;
 	return *(Descriptor*)(&s_gdt[i]);
 }
 
-void flushGDT() {
+void flush() {
 	s_gdtr.address = s_gdt;
 	s_gdtr.size = (s_gdtLength * 8) - 1;
 	asm("lgdt %0"::"m"(s_gdtr));
 }
 
-void gdt_init() {
+void init() {
 	s_gdtLength = 5;
 
 	s_gdtr.address = s_gdt;
 	s_gdtr.size = (s_gdtLength * 8) - 1;
 
-	writeRawGDTEntry(0x0000, 0x00000000, 0x00000000);
-	writeRawGDTEntry(0x0008, 0x0000ffff, 0x00cf9a00);
-	writeRawGDTEntry(0x0010, 0x0000ffff, 0x00cf9200);
-	writeRawGDTEntry(0x0018, 0x0000ffff, 0x00cffa00);
-	writeRawGDTEntry(0x0020, 0x0000ffff, 0x00cff200);
+	writeRawEntry(0x0000, 0x00000000, 0x00000000);
+	writeRawEntry(0x0008, 0x0000ffff, 0x00cf9a00);
+	writeRawEntry(0x0010, 0x0000ffff, 0x00cf9200);
+	writeRawEntry(0x0018, 0x0000ffff, 0x00cffa00);
+	writeRawEntry(0x0020, 0x0000ffff, 0x00cff200);
 
-	flushGDT();
+	flush();
 }
 
-static void unimp_trap() {
-	print("Unhandled IRQ");
-	HANG;
-}
-
-void registerInterruptHandler(UInt8 vector, void (*f)()) {
-	s_idt[vector].low = 0x00080000 | LSW((f));
-	s_idt[vector].high = ((UInt32)(f) & 0xffff0000) | 0x8e00;
-	flushIDT();
-}
-
-void registerUserCallableInterruptHandler(UInt8 vector, void (*f)()) {
-	s_idt[vector].low = 0x00080000 | LSW((f));
-	s_idt[vector].high = ((UInt32)(f) & 0xffff0000) | 0xee00;
-	flushIDT();
-}
-
-void flushIDT() {
-	asm("lidt %0"::"m"(s_idtr));
-}
+};
 
 /* If an 8259 gets cranky, it'll generate a spurious IRQ7.
  * ATM I don't have a clear grasp on when/why this happens,
@@ -130,7 +118,13 @@ asm(
 	"    iret\n"
 );
 
-void idt_init() {
+namespace IDT {
+
+void flush() {
+	asm("lidt %0"::"m"(s_idtr));
+}
+
+void init() {
 
 	s_idtr.address = s_idt;
 	s_idtr.size = 0x100 * 8;
@@ -157,9 +151,19 @@ void idt_init() {
 
 	registerInterruptHandler(0x57, irq7_handler);
 
-	flushIDT();
+	flush();
 }
 
-void loadTaskRegister(word selector) {
-	asm("ltr %0"::"r"(selector));
+};
+
+void registerInterruptHandler(UInt8 vector, void (*f)()) {
+	s_idt[vector].low = 0x00080000 | LSW((f));
+	s_idt[vector].high = ((UInt32)(f) & 0xffff0000) | 0x8e00;
+	IDT::flush();
+}
+
+void registerUserInterruptHandler(UInt8 vector, void (*f)()) {
+	s_idt[vector].low = 0x00080000 | LSW((f));
+	s_idt[vector].high = ((UInt32)(f) & 0xffff0000) | 0xee00;
+	IDT::flush();
 }

@@ -10,12 +10,14 @@
 const char* dayNames[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 const char* monthNames[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-bool rtc_updating() {
+namespace RTC {
+
+bool updating() {
 	return cmos_read(0x0a) & 0x80;
 }
 
-void rtc_printTime() {
-	while(rtc_updating());
+void printTime() {
+	while(updating());
 
 	UInt8 hours = cmos_read(0x04);
 
@@ -30,9 +32,11 @@ void rtc_printTime() {
 	);
 }
 
-void rtc_init() {
+void init() {
 	byte mode = cmos_read(0x0b);
 	mode |= 2; // 24hr mode
 	mode |= 4; // No BCD
 	cmos_write(0x0b, mode);
 }
+
+};

@@ -9,10 +9,7 @@ OBJS = \
 	drivers/i386.o \
 	drivers/keyboard.o \
 	drivers/pit.o \
-	drivers/rtc.o \
-	drivers/ide.o
-
-# 	gui.o \
+	drivers/rtc.o
 
 all: build/disk.img
 
@@ -32,4 +29,4 @@ clean:
 	@echo "Cleaning"; rm -f $(OBJS) build/kernel.bin build/boot.bin
 
 run:
-	@echo "Running emulator"; qemu-system-i386 -m 4M -drive format=raw,file=build/disk.img,if=floppy -rtc base=localtime -name FOSOS
+	@echo "Running emulator"; qemu-system-i386 -drive format=raw,file=build/disk.img,if=floppy -rtc base=localtime -name FOSOS
