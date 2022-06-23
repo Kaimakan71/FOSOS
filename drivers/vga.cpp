@@ -198,3 +198,9 @@ void print(const char *fmt, ...) {
 	// Update the cursor
 	VGA::setCursor(VGA::cursor);
 }
+
+void error(const char* message) {
+	VGA::setColor(0x0c);
+	print("Error: %s", message);
+	VGA::setColor(0x07);
+}

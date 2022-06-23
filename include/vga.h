@@ -25,6 +25,7 @@ void putCharAt(char character, UInt8 x, UInt8 y);
 void fillRect(UInt8 x, UInt8 y, UInt8 width, UInt8 height, byte color);
 void clearChar(UInt16 index);
 void print(const char *fmt, ...);
+void error(const char* message);
 
 namespace VGA {
 

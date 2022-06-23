@@ -21,9 +21,13 @@ typedef struct {
 } System;
 extern System system;
 
+#define DISALLOW_ARGS(i) if(argc > i) { error("too many arguments in invocation"); return 1; }
+#define REQUIRE_ARGS(i) if(argc < i) { error("not enough arguments in invocation"); return 1; }
+#define REQUIRE_EXACT_ARGS(i) if(argc != i) { error("incorrect number of arguments in invocation"); return 1; }
+
 namespace Shell {
 
-extern char inbuf[64];
+extern char inbuf[256];
 extern UInt8 inbufPos;
 
 void handleInput();

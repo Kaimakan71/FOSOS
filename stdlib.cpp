@@ -34,3 +34,18 @@ bool streq(const char* s1, const char* s2) {
 	for(; *s1 == *s2; ++s1, ++s2) if(*s1 == 0) return true;
 	return false;
 }
+
+int strspl(char *str, char delim, char* words[], int maxWords) {
+	int nextIndex = 0;
+
+	while(*str != '\0') {
+		while(*str == delim) *str++ = '\0';
+
+		if(*str != '\0') {
+			if(nextIndex < maxWords) words[nextIndex++] = str++;
+			while(*str != '\0' && *str != delim) str++;
+		}
+	};
+
+	return nextIndex;
+}
