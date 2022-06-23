@@ -6,7 +6,6 @@
  */
 
 #include <shell.h>
-#include <pit.h>
 
 System system;
 
@@ -101,7 +100,7 @@ int $hostname(int argc, char* argv[]) {
 		strcpy(system.hostname, argv[1]);
 		print("Hostname set to ");
 	}
-	
+
 	print(system.hostname);
 	return 0;
 }
@@ -120,6 +119,17 @@ int $banner(int argc, char* argv[]) {
 
 int invoke(int argc, char* argv[]) {
 	if(streq(argv[0], "help")) return $help(argc, argv);
+	if(streq(argv[0], "read")) {
+		byte buffer[512];
+		ide_read(0, buffer);
+		print((char*)buffer);
+		return 0;
+	}
+	if(streq(argv[0], "write")) {
+		byte buffer[512] = { 'T', 'e', 'S', 't', 'I', 'n', 'G', '\0' };
+		ide_write(0, buffer);
+		return 0;
+	}
 	if(streq(argv[0], "pwd")) return $pwd(argc, argv);
 	if(streq(argv[0], "realpath")) return $realpath(argc, argv);
 	if(streq(argv[0], "clear")) return $clear(argc, argv);

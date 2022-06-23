@@ -6,8 +6,9 @@
  */
 
 #include <types.h>
-#include <pic.h>
 #include <i386.h>
+#include <rtc.h>
+#include <pic.h>
 #include <keyboard.h>
 #include <pit.h>
 #include <shell.h>

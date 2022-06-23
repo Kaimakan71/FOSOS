@@ -11,11 +11,11 @@
 
 byte inb(word port);
 word inw(word port);
-dword ind(word port);
+dword inl(word port);
 
 void outb(word port, byte data);
 void outw(word port, word data);
-void outd(word port, dword data);
+void outl(word port, dword data);
 
 byte cmos_read(byte index);
 void cmos_write(byte index, byte data);

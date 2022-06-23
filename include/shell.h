@@ -11,6 +11,8 @@
 #include <vga.h>
 #include <stdlib.h>
 #include <rtc.h>
+#include <pit.h>
+#include <ide.h>
 
 typedef struct {
 	char username[32];

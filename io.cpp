@@ -19,7 +19,7 @@ word inw(word port) {
 	return value;
 }
 
-dword ind(dword port) {
+dword inl(dword port) {
 	dword value;
 	asm("inl %%dx, %%eax":"=a"(value):"d"(port));
 	return value;
@@ -33,7 +33,7 @@ void outw(word port, word value) {
 	asm("outw %%ax, %%dx"::"d"(port), "a"(value));
 }
 
-void outd(word port, word value) {
+void outl(word port, dword value) {
 	asm("outl %%eax, %%dx"::"d"(port), "a"(value));
 }
 
