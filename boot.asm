@@ -79,7 +79,7 @@ initProtected:
     mov fs, ax
     mov gs, ax
 
-    mov esp, 0x2000 ; Set up a 32-bit stack
+    mov esp, 0x7bff ; Set up a 32-bit stack
 
     jmp 0x10000 ; Jump to the kernel
 

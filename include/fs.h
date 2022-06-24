@@ -8,21 +8,16 @@
 #pragma once
 
 #include <types.h>
+#include <mem.h>
 #include <vga.h>
 #include <ide.h>
 #include <assert.h>
 
-#define FAT_ENTRY_BYTES 4
-#define BLOCK_BYTES 1024
+#define BLOCK_SIZE 1024
+#define SECTOR_SIZE 512
+typedef UInt32 FATEntry;
 
 namespace FS {
-
-// 32 bytes
-typedef struct {
-	char name[24];
-	int size;
-	int firstBlock;
-} PACKED DirEnt;
 
 void init();
 

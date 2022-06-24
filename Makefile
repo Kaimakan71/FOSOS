@@ -7,6 +7,7 @@ OBJS = \
 	io.o \
 	shell.o \
 	fs.o \
+	mem.o \
 	drivers/pic.o \
 	drivers/vga.o \
 	drivers/i386.o \

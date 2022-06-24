@@ -183,6 +183,9 @@ void reset() {
 }
 
 void init() {
+	// Initialize the heap manager
+	mem_init();
+
 	// Set system defaults
 	strcpy(system.username, "kai");
 	strcpy(system.hostname, "native");
