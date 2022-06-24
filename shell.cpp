@@ -34,6 +34,7 @@ int $help(int argc, char* argv[]) {
 
 	print(
 		"help     - prints this message\n"
+		"initfs   - initializes the experimental file system\n"
 		"pwd      - prints the current working directory\n"
 		"realpath - get the full path of a file\n"
 		"clear    - clears the screen\n"
@@ -119,15 +120,9 @@ int $banner(int argc, char* argv[]) {
 
 int invoke(int argc, char* argv[]) {
 	if(streq(argv[0], "help")) return $help(argc, argv);
-	if(streq(argv[0], "read")) {
-		byte buffer[512];
-		ide_read(0, buffer);
-		print((char*)buffer);
-		return 0;
-	}
-	if(streq(argv[0], "write")) {
-		byte buffer[512] = { 'T', 'e', 'S', 't', 'I', 'n', 'G', '\0' };
-		ide_write(0, buffer);
+	if(streq(argv[0], "initfs")) {
+		VGA::clearScreen(); // Clear screen, there will be a lot of printing
+		FS::init();
 		return 0;
 	}
 	if(streq(argv[0], "pwd")) return $pwd(argc, argv);

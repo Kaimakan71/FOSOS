@@ -10,6 +10,9 @@
 #include <types.h>
 #include <io.h>
 
+// We should really detect this, but I'll assume for now
+#define DISK_BYTES (64 * 1024)
+
 #define IDE_BSY 0x80
 #define IDE_RDY 0x40
 #define IDE_DF  0x20
@@ -19,5 +22,9 @@
 #define WAIT_BSY() while(inb(0x1f7) & IDE_BSY);
 #define WAIT_RDY() while(!(inb(0x1f7) & IDE_RDY));
 
-void ide_read(UInt32 lba, byte* buffer);
-void ide_write(UInt32 lba, byte* buffer);
+namespace Disk {
+
+void read(UInt32 start, UInt8 count, byte* buffer);
+void write(UInt32 start, UInt8 count, byte* buffer);
+
+};

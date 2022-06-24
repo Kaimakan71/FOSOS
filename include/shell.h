@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <rtc.h>
 #include <pit.h>
-#include <ide.h>
+#include <fs.h>
 
 typedef struct {
 	char username[32];
