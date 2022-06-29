@@ -1,32 +1,25 @@
-/*
- * FOSOS shell
- *
- * Copyright (c) 2022, the FOSOS developers.
- * SPDX-License-Identifier: BSD-2-Clause
- */
-
 #include <shell.h>
 
 System system;
 
-namespace Shell {
+char shell_inbuf[256];
+UInt8 shell_inbufPos;
 
-char inbuf[256];
-UInt8 inbufPos;
-
-void prompt() {
-	VGA::setColor(0x0a);
+void shell_prompt() {
+	vga_setColor(0xa, 0x0);
 	print(system.username);
-	VGA::setColor(0x07);
-	print("@");
-	VGA::setColor(0x0f);
+	vga_setColor(0x7, 0x0);
+	putChar('@');
+	vga_setColor(0xf, 0x0);
 	print(system.hostname);
-	VGA::setColor(0x07);
-	print(":");
-	VGA::setColor(0x0b);
+	vga_setColor(0x7, 0x0);
+	putChar(':');
+	vga_setColor(0xb, 0x0);
 	print(system.path);
-	VGA::setColor(0x07);
-	print("> ");
+	vga_setColor(0x7, 0x0);
+	putChar('>');
+	putChar(' ');
+	vga_updateCursor();
 }
 
 int $help(int argc, char* argv[]) {
@@ -34,7 +27,6 @@ int $help(int argc, char* argv[]) {
 
 	print(
 		"help     - prints this message\n"
-		"initfs   - initializes the experimental file system\n"
 		"pwd      - prints the current working directory\n"
 		"realpath - get the full path of a file\n"
 		"clear    - clears the screen\n"
@@ -60,7 +52,7 @@ int $realpath(int argc, char* argv[]) {
 	// If not full path, add current directory
 	if(*argv[1] != '/') print(system.path);
 	// If the current directory is not root, add a /
-	if(strlen(system.path) > 1) print("/");
+	if(strlen(system.path) > 1) putChar('/');
 	print(argv[1]);
 	return 0;
 }
@@ -68,14 +60,14 @@ int $realpath(int argc, char* argv[]) {
 int $clear(int argc, char* argv[]) {
 	DISALLOW_ARGS(1);
 
-	VGA::clearScreen();
+	clearScreen();
 	return 0;
 }
 
 int $date(int argc, char* argv[]) {
 	DISALLOW_ARGS(1);
 
-	RTC::printTime();
+	rtc_printTime();
 	return 0;
 }
 
@@ -107,24 +99,17 @@ int $hostname(int argc, char* argv[]) {
 }
 
 // Print a banner in a bright color
-int $banner(int argc, char* argv[]) {
-	DISALLOW_ARGS(1);
-
-	VGA::setColor(0x0f);
+int $banner() {
+	vga_setColor(0xf, 0x0);
 	print("    dBBBBP dBBBBP.dBBBBP   dBBBBP.dBBBBP\n   dBP    dB'.BP BP       dB'.BP BP\n  dBBBP  dB'.BP  `BBBBb  dB'.BP  `BBBBb\n dBP    dB'.BP      dBP dB'.BP      dBP\ndBP    dBBBBP  dBBBBP' dBBBBP  dBBBBP'   v1.0\n");
-	VGA::setColor(0x07);
+	vga_setColor(0x7, 0x0);
 	print("Copyright (c) 2022, the FOSOS developers.\n\n");
-	
+
 	return 0;
 }
 
 int invoke(int argc, char* argv[]) {
 	if(streq(argv[0], "help")) return $help(argc, argv);
-	if(streq(argv[0], "initfs")) {
-		VGA::clearScreen(); // Clear screen, there will be a lot of printing
-		FS::init();
-		return 0;
-	}
 	if(streq(argv[0], "pwd")) return $pwd(argc, argv);
 	if(streq(argv[0], "realpath")) return $realpath(argc, argv);
 	if(streq(argv[0], "clear")) return $clear(argc, argv);
@@ -140,15 +125,17 @@ int invoke(int argc, char* argv[]) {
 
 // Invoke with no arguments
 int run(const char* name) {
-	char* argv[1] = { const_cast<char*>(name) };
+	char argv0[strlen(name)];
+	strcpy(argv0, name);
+	char* argv[1] = { argv0 };
 	return invoke(1, argv);
 }
 
-void handleInput() {
+void shell_handleInput() {
 	print("\n");
 
 	char* argv[128];
-	int argc = strspl(inbuf, ' ', argv, sizeof(argv) / sizeof(argv[0]));
+	int argc = strspl(shell_inbuf, ' ', argv, sizeof(argv) / sizeof(argv[0]));
 
 	// Ignore empty lines
 	if(strlen(argv[0]) > 0) {
@@ -158,34 +145,31 @@ void handleInput() {
 	}
 
 	// Prompt for next command
-	prompt();
+	shell_prompt();
 
 	// Empty the input buffer
-	memset(inbuf, 0, sizeof(inbuf));
-	inbufPos = 0;
+	memset(shell_inbuf, 0, sizeof(shell_inbuf));
+	shell_inbufPos = 0;
 }
 
-void reset() {
+void shell_reset() {
 	// Reset screen and color
-	VGA::setColor(0x07);
-	VGA::clearScreen();
+	vga_setColor(0x7, 0x0);
+	clearScreen();
 
 	// Print banner, time, and prompt
 	run("banner");
 	print("%uKiB base memory\nHello, %s! Current time is ", system.memory, system.username);
 	run("date");
 	print("\nType 'help' for a list of commands and use ctrl+c if you get stuck :-)\n");
-	prompt();
+	shell_prompt();
 
 	// Empty shell input buffer
-	memset(inbuf, 0, sizeof(inbuf));
-	inbufPos = 0;
+	memset(shell_inbuf, 0, sizeof(shell_inbuf));
+	shell_inbufPos = 0;
 }
 
-void init() {
-	// Initialize the heap manager
-	mem_init();
-
+void shell_init() {
 	// Set system defaults
 	strcpy(system.username, "kai");
 	strcpy(system.hostname, "native");
@@ -193,7 +177,5 @@ void init() {
 	system.uptime = 0;
 	system.memory = (cmos_read(0x16) << 8) | cmos_read(0x15);
 
-	reset();
+	shell_reset();
 }
-
-};

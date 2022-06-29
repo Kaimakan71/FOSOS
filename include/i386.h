@@ -1,30 +1,29 @@
-/*
- * i386-specific utilities
- *
- * Copyright (c) 2022, the FOSOS developers.
- * SPDX-License-Identifier: BSD-2-Clause
- */
-
 #pragma once
 
 #include <types.h>
-#include <types.h>
-#include <vga.h>
 #include <assert.h>
+#include <vga.h>
 
-union Descriptor {
+#define IRQ_VECTOR_BASE 0x20
+
+typedef struct {
+	UInt16 limit;
+	void* base;
+} PACKED DTR;
+
+typedef union {
 	struct {
 		UInt16 limit_lo;
 		UInt16 base_lo;
 		byte base_hi;
 		byte type: 4;
-		byte descriptor_type: 1;
+		byte descriptorType: 1;
 		byte dpl: 2;
-		byte segment_present: 1;
+		byte present: 1;
 		byte limit_hi: 4;
 		byte: 1;
 		byte zero: 1;
-		byte operation_size: 1;
+		byte operationSize: 1;
 		byte granularity: 1;
 		byte base_hi2;
 	};
@@ -32,57 +31,11 @@ union Descriptor {
 		UInt32 low;
 		UInt32 high;
 	};
+} PACKED Descriptor;
 
-	enum Type {
-		Invalid = 0,
-		AvailableTSS_16bit = 0x1,
-		LDT = 0x2,
-		BusyTSS_16bit = 0x3,
-		CallGate_16bit = 0x4,
-		TaskGate = 0x5,
-		InterruptGate_16bit = 0x6,
-		TrapGate_16bit = 0x7,
-		AvailableTSS_32bit = 0x9,
-		BusyTSS_32bit = 0xb,
-		CallGate_32bit = 0xc,
-		InterruptGate_32bit = 0xe,
-		TrapGate_32bit = 0xf,
-	};
-
-	void setBase(void* b) {
-		base_lo = (UInt32)(b) & 0xffff;
-		base_hi = ((UInt32)(b) >> 16) & 0xff;
-		base_hi2 = ((UInt32)(b) >> 24) & 0xff;
-	}
-
-	void setLimit(UInt32 l) {
-		limit_lo = (UInt32)l & 0xffff;
-		limit_hi = ((UInt32)l >> 16) & 0xff;
-	}
-} PACKED;
-
-namespace GDT {
-
-word allocateEntry();
-void writeEntry(UInt16 selector, Descriptor&);
-Descriptor& getEntry(UInt16 selector);
-void flush();
-void init();
-
-};
-
-namespace IDT {
-
-void flush();
-void init();
-
-};
-
+void gdt_init();
 void registerInterruptHandler(UInt8 vector, void (*f)());
 void registerUserInterruptHandler(UInt8 vector, void (*f)());
+void idt_init();
 
-#define loadTaskRegister(selector) asm volatile("ltr %0"::"r"(selector));
-#define disableInterrupts() asm volatile("cli");
 #define enableInterrupts() asm volatile("sti");
-
-#define IRQ_VECTOR_BASE 0x20

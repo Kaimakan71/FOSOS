@@ -1,14 +1,7 @@
-/*
- * i8253 PIT driver
- *
- * Copyright (c) 2022, the FOSOS developers.
- * SPDX-License-Identifier: BSD-2-Clause
- */
-
 #pragma once
 
 #include <types.h>
-#include <io.h>
+#include <ports.h>
 #include <pic.h>
 #include <shell.h>
 
@@ -31,8 +24,4 @@
 #define BASE_FREQ 1193182
 #define TICKS_PER_SECOND 600
 
-namespace PIT {
-
-void init();
-
-};
+void pit_init();

@@ -7,10 +7,8 @@
 
 #include <pit.h>
 
-namespace PIT {
-
-extern "C" void tick_isr();
-extern "C" void handle_clock();
+extern void tick_isr();
+extern void handle_clock();
 
 asm(
 	".globl tick_isr\n"
@@ -32,10 +30,10 @@ asm(
 
 void handle_clock() {
 	system.uptime++;
-	PIC::eoi(IRQ_TIMER);
+	pic_eoi(IRQ_TIMER);
 }
 
-void init() {
+void pit_init() {
 	outb(PIT_CMD, TIMER0_SELECT | WRITE_WORD | TIMER_MODE_SQUARE_WAVE);
 
 	UInt16 reload = (BASE_FREQ / TICKS_PER_SECOND);
@@ -43,7 +41,5 @@ void init() {
 	outb(TIMER0_CMD, MSB(reload));
 
 	registerInterruptHandler(IRQ_VECTOR_BASE + IRQ_TIMER, tick_isr);
-	PIC::enable(IRQ_TIMER);
+	pic_enable(IRQ_TIMER);
 }
-
-};

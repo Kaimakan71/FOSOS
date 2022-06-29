@@ -1,15 +1,6 @@
-/*
- * Basic PIC controller
- *
- * Copyright (c) 2022, the FOSOS developers.
- * SPDX-License-Identifier: BSD-2-Clause
- */
-
 #include <pic.h>
 
-namespace PIC {
-
-void disable(UInt8 vector) {
+void pic_disable(UInt8 vector) {
 	byte imr;
 	if(vector & 8) {
 		imr = inb(PIC1_DAT);
@@ -22,7 +13,7 @@ void disable(UInt8 vector) {
 	}
 }
 
-void enable(UInt8 vector) {
+void pic_enable(UInt8 vector) {
 	byte imr;
 	if(vector & 8) {
 		imr = inb(PIC1_DAT);
@@ -35,19 +26,19 @@ void enable(UInt8 vector) {
 	}
 }
 
-void eoi(UInt8 vector) {
+void pic_eoi(UInt8 vector) {
 	if(vector & 8) outb(PIC1_CMD, 0x20);
 	outb(PIC0_CMD, 0x20);
 }
 
-void init() {
+void pic_init() {
 	// Enter edge triggered mode with cascading controllers
 	outb(PIC0_CMD, 0x11);
 	outb(PIC1_CMD, 0x11);
 
 	// Remap IRQs to avoid exception ISRs
-	outb(PIC0_DAT, IRQ_VECTOR_BASE);
-	outb(PIC1_DAT, IRQ_VECTOR_BASE + 0x08);
+	outb(PIC0_DAT, PIC0_VECTOR_BASE);
+	outb(PIC1_DAT, PIC1_VECTOR_BASE);
 
 	// Configure master-slave relationship
 	outb(PIC0_DAT, 1 << SLAVE_INDEX);
@@ -62,7 +53,5 @@ void init() {
 	outb(PIC1_DAT, 0xff);
 
 	// Enable the master-slave communication line
-	enable(SLAVE_INDEX);
+	pic_enable(SLAVE_INDEX);
 }
-
-};

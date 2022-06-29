@@ -1,23 +1,14 @@
-/*
- * FOSOS RTC driver
- *
- * Copyright (c) 2022, the FOSOS developers.
- * SPDX-License-Identifier: BSD-2-Clause
- */
-
 #include <rtc.h>
 
 const char* dayNames[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 const char* monthNames[12] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-namespace RTC {
-
-bool updating() {
+bool rtc_updating() {
 	return cmos_read(0x0a) & 0x80;
 }
 
-void printTime() {
-	while(updating());
+void rtc_printTime() {
+	while(rtc_updating());
 
 	UInt8 hours = cmos_read(0x04);
 
@@ -32,11 +23,9 @@ void printTime() {
 	);
 }
 
-void init() {
+void rtc_init() {
 	byte mode = cmos_read(0x0b);
 	mode |= 2; // 24hr mode
 	mode |= 4; // No BCD
 	cmos_write(0x0b, mode);
 }
-
-};

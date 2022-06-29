@@ -3,7 +3,7 @@ ENTRY(_start)
 
 SECTIONS
 {
-	/* Start at 1MiB, where the bootloader loads us */
+	/* Start at 64K, where the bootloader loads us */
 	. = 0x10000;
 
 	/* Executable code first */

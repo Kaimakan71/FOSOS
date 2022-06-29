@@ -1,7 +1,6 @@
 #pragma once
 
 #include <types.h>
-#include <assert.h>
 
 void memcpy(void*, const void*, UInt32);
 void strcpy(char*, const char*);

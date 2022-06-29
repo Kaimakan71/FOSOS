@@ -2,7 +2,3 @@
 *.o
 # Binaries other than disk image
 build/*.bin
-# Filesystem contents
-build/fs.img
-# Work-In-Progress stuff I'm not ready to commit yet
-wip/*
