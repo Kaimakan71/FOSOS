@@ -1,3 +1,10 @@
+/**
+ * FOSOS real-time clock driver
+ *
+ * Copyright (c) 2022, the FOSOS developers.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 #include <rtc.h>
 
 const char* dayNames[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };

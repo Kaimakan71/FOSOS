@@ -1,3 +1,11 @@
+/**
+ * FOSOS keyboard driver
+ * Currently US-only (plans for more later)
+ *
+ * Copyright (c) 2022, the FOSOS developers.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 #include <keyboard.h>
 
 extern void handle_keyboard();

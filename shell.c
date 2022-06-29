@@ -1,3 +1,10 @@
+/*
+ * FOSOS shell
+ *
+ * Copyright (c) 2022, the FOSOS developers.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 #include <shell.h>
 
 System system;
@@ -139,7 +146,7 @@ void shell_handleInput() {
 	int argc = strspl(shell_inbuf, ' ', argv, sizeof(argv) / sizeof(argv[0]));
 
 	// Ignore empty lines
-	if(strlen(argv[0]) > 0) {
+	if(strlen(shell_inbuf) > 0) {
 		// Run command
 		invoke(argc, argv);
 		printf("\n");

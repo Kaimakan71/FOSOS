@@ -1,3 +1,10 @@
+/**
+ * i8259 Programmable Interrupt Controller driver for FOSOS
+ *
+ * Copyright (c) 2022, the FOSOS developers.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 #include <pic.h>
 
 void pic_disable(UInt8 vector) {

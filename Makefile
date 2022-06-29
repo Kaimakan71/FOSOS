@@ -1,3 +1,8 @@
+# FOSOS makefile
+#
+# Copyright (c) 2022, the FOSOS developers.
+# SPDX-License-Identifier: BSD-2-Clause
+
 OBJS = \
 	_start.o \
 	init.o \

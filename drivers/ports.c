@@ -1,3 +1,10 @@
+/*
+ * FOSOS port I/O functions
+ *
+ * Copyright (c) 2022, the FOSOS developers.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 #include <ports.h>
 
 byte inb(UInt16 port) {

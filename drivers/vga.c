@@ -1,3 +1,10 @@
+/**
+ * FOSOS VGA text mode driver
+ *
+ * Copyright (c) 2022, the FOSOS developers.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 #include <vga.h>
 
 const char hexChars[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
@@ -37,6 +44,15 @@ void putChar(char character) {
 		vga_mem[vga_cursor * 2] = character;
 		vga_mem[vga_cursor * 2 + 1] = vga_color;
 		vga_cursor++;
+	}
+
+	if((vga_cursor / VGA_WIDTH) == VGA_HEIGHT) {
+		memcpy(vga_mem, vga_mem + 160, 160 * 24);
+
+		word* linemem = (word*)&vga_mem[24 * 160];
+		for(UInt8 i = 0; i < 80; i++) linemem[i] = 0x0720;
+		vga_cursor = 24 * VGA_WIDTH;
+		vga_updateCursor();
 	}
 }
 

@@ -1,3 +1,10 @@
+/*
+ * FOSOS standard library routines
+ *
+ * Copyright (c) 2022, the FOSOS developers.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 #include <stdlib.h>
 
 void memcpy(void *dest, const void *src, UInt32 n) {

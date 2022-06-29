@@ -1,3 +1,10 @@
+/**
+ * FOSOS kernel initialization
+ *
+ * Copyright (c) 2022, the FOSOS developers.
+ * SPDX-License-Identifier: BSD-2-Clause
+ */
+
 #include <types.h>
 #include <assert.h>
 #include <vga.h>
