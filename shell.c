@@ -7,15 +7,15 @@ UInt8 shell_inbufPos;
 
 void shell_prompt() {
 	vga_setColor(0xa, 0x0);
-	print(system.username);
+	printf(system.username);
 	vga_setColor(0x7, 0x0);
 	putChar('@');
 	vga_setColor(0xf, 0x0);
-	print(system.hostname);
+	printf(system.hostname);
 	vga_setColor(0x7, 0x0);
 	putChar(':');
 	vga_setColor(0xb, 0x0);
-	print(system.path);
+	printf(system.path);
 	vga_setColor(0x7, 0x0);
 	putChar('>');
 	putChar(' ');
@@ -25,7 +25,7 @@ void shell_prompt() {
 int $help(int argc, char* argv[]) {
 	DISALLOW_ARGS(1);
 
-	print(
+	printf(
 		"help     - prints this message\n"
 		"pwd      - prints the current working directory\n"
 		"realpath - get the full path of a file\n"
@@ -42,7 +42,7 @@ int $help(int argc, char* argv[]) {
 int $pwd(int argc, char* argv[]) {
 	DISALLOW_ARGS(1);
 
-	print(system.path);
+	printf(system.path);
 	return 0;
 }
 
@@ -50,10 +50,10 @@ int $realpath(int argc, char* argv[]) {
 	REQUIRE_EXACT_ARGS(2);
 
 	// If not full path, add current directory
-	if(*argv[1] != '/') print(system.path);
+	if(*argv[1] != '/') printf(system.path);
 	// If the current directory is not root, add a /
 	if(strlen(system.path) > 1) putChar('/');
-	print(argv[1]);
+	printf(argv[1]);
 	return 0;
 }
 
@@ -67,7 +67,8 @@ int $clear(int argc, char* argv[]) {
 int $date(int argc, char* argv[]) {
 	DISALLOW_ARGS(1);
 
-	rtc_printTime();
+	rtc_printDate();
+
 	return 0;
 }
 
@@ -75,14 +76,14 @@ int $uptime(int argc, char* argv[]) {
 	DISALLOW_ARGS(1);
 
 	UInt32 seconds = system.uptime / TICKS_PER_SECOND;
-	print("%um %us", seconds / 60, seconds % 60);
+	printf("%um %us", seconds / 60, seconds % 60);
 	return 0;
 }
 
 int $whoami(int argc, char* argv[]) {
 	DISALLOW_ARGS(1);
 
-	print(system.username);
+	printf(system.username);
 	return 0;
 }
 
@@ -91,19 +92,19 @@ int $hostname(int argc, char* argv[]) {
 
 	if(argc > 1) {
 		strcpy(system.hostname, argv[1]);
-		print("Hostname set to ");
+		printf("Hostname set to ");
 	}
 
-	print(system.hostname);
+	printf(system.hostname);
 	return 0;
 }
 
 // Print a banner in a bright color
 int $banner() {
 	vga_setColor(0xf, 0x0);
-	print("    dBBBBP dBBBBP.dBBBBP   dBBBBP.dBBBBP\n   dBP    dB'.BP BP       dB'.BP BP\n  dBBBP  dB'.BP  `BBBBb  dB'.BP  `BBBBb\n dBP    dB'.BP      dBP dB'.BP      dBP\ndBP    dBBBBP  dBBBBP' dBBBBP  dBBBBP'   v1.0\n");
+	printf("    dBBBBP dBBBBP.dBBBBP   dBBBBP.dBBBBP\n   dBP    dB'.BP BP       dB'.BP BP\n  dBBBP  dB'.BP  `BBBBb  dB'.BP  `BBBBb\n dBP    dB'.BP      dBP dB'.BP      dBP\ndBP    dBBBBP  dBBBBP' dBBBBP  dBBBBP'   v1.0\n");
 	vga_setColor(0x7, 0x0);
-	print("Copyright (c) 2022, the FOSOS developers.\n\n");
+	printf("Copyright (c) 2022, the FOSOS developers.\n\n");
 
 	return 0;
 }
@@ -119,7 +120,7 @@ int invoke(int argc, char* argv[]) {
 	if(streq(argv[0], "whoami")) return $whoami(argc, argv);
 	if(streq(argv[0], "hostname")) return $hostname(argc, argv);
 
-	print("Unknown command '%s'", argv[0]);
+	printf("Unknown command '%s'", argv[0]);
 	return -1;
 }
 
@@ -132,7 +133,7 @@ int run(const char* name) {
 }
 
 void shell_handleInput() {
-	print("\n");
+	printf("\n");
 
 	char* argv[128];
 	int argc = strspl(shell_inbuf, ' ', argv, sizeof(argv) / sizeof(argv[0]));
@@ -141,7 +142,7 @@ void shell_handleInput() {
 	if(strlen(argv[0]) > 0) {
 		// Run command
 		invoke(argc, argv);
-		print("\n");
+		printf("\n");
 	}
 
 	// Prompt for next command
@@ -159,9 +160,9 @@ void shell_reset() {
 
 	// Print banner, time, and prompt
 	run("banner");
-	print("%uKiB base memory\nHello, %s! Current time is ", system.memory, system.username);
+	printf("%uKiB base memory\nHello, %s! Current time is ", system.memory, system.username);
 	run("date");
-	print("\nType 'help' for a list of commands and use ctrl+c if you get stuck :-)\n");
+	printf("\nType 'help' for a list of commands and use ctrl+c if you get stuck :-)\n");
 	shell_prompt();
 
 	// Empty shell input buffer

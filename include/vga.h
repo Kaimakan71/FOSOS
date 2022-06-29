@@ -24,7 +24,7 @@ void putCharAt(char character, UInt8 x, UInt8 y);
 void printUInt(UInt32 number);
 void printInt(int number);
 void printHex(UInt32 number, UInt8 fields);
-void print(const char* fmt, ... );
+void printf(const char* fmt, ... );
 
 void clearScreen();
 void printCenter(const char* string);

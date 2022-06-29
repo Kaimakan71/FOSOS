@@ -11,7 +11,7 @@
 void init() {
 	// Initialize things we need for debugging
 	vga_init();
-	print("Starting FOSOS...\n");
+	printf("Starting FOSOS...\n");
 
 	// Initialize the real-time clock
 	rtc_init();
@@ -24,6 +24,7 @@ void init() {
 	// Register interrupt handlers / initialize drivers
 	kbd_init();
 	pit_init();
+	pic_enable(IRQ_TIMER);
 
 	// Initialize the shell
 	shell_init();

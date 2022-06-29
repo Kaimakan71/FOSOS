@@ -31,6 +31,18 @@ void pic_eoi(UInt8 vector) {
 	outb(PIC0_CMD, 0x20);
 }
 
+// Dump the IRR and ISR registers
+// I think this works?
+void pic_dumpRegs() {
+	outb(PIC0_CMD, 0x0a);
+	outb(PIC1_CMD, 0x0a);
+	byte irr = (inb(PIC1_CMD) << 8) | inb(PIC0_CMD);
+	outb(PIC0_CMD, 0x0b);
+	outb(PIC1_CMD, 0x0b);
+	byte isr = (inb(PIC1_CMD) << 8) | inb(PIC0_CMD);
+	printf("IRR=%x ISR=%x", irr, isr);
+}
+
 void pic_init() {
 	// Enter edge triggered mode with cascading controllers
 	outb(PIC0_CMD, 0x11);

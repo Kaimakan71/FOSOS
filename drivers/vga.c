@@ -1,6 +1,7 @@
 #include <vga.h>
 
 const char hexChars[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+const char hexCharsUpper[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 byte* vga_mem = (byte*)0xb8000;
 byte vga_color = 0x07;
 volatile UInt16 vga_cursor;
@@ -74,6 +75,8 @@ void printInt(int number) {
 }
 
 void printHex(UInt32 number, UInt8 fields) {
+	putChar('0');
+	putChar('x');
 	byte shr_count = fields * 4;
 	while(shr_count) {
 		shr_count -= 4;
@@ -81,7 +84,17 @@ void printHex(UInt32 number, UInt8 fields) {
 	}
 }
 
-void print(const char* fmt, ... ) {
+void printHexUpper(UInt32 number, UInt8 fields) {
+	putChar('0');
+	putChar('X');
+	byte shr_count = fields * 4;
+	while(shr_count) {
+		shr_count -= 4;
+		putChar(hexCharsUpper[(number >> shr_count) & 0x0f]);
+	}
+}
+
+void printf(const char* fmt, ... ) {
 	const char* p;
 	va_list ap;
 	va_start(ap, fmt);
@@ -103,31 +116,30 @@ void print(const char* fmt, ... ) {
 						} else while(*sp != '\0') putChar(*sp++);
 					}
 					break;
+				case 'd':
+				case 'i':
+					// Signed integer
+					printInt(va_arg(ap, int));
+					break;
 				case 'u':
 					// Unsigned integer
 					printUInt(va_arg(ap, UInt32));
 					break;
-				case 'i':
-					// Integer
-					printInt(va_arg(ap, int));
+				case 'x':
+					// Hexadecimal, lowercase
+					printHex(va_arg(ap, UInt32), 8);
+					break;
+				case 'X':
+					// Hexadecimal, lowercase
+					printHexUpper(va_arg(ap, UInt32), 8);
 					break;
 				case 'b':
 					// Hex byte
-					putChar('0');
-					putChar('x');
 					printHex(va_arg(ap, UInt32), 2);
 					break;
-				case 'h':
-					// Hex short
-					putChar('0');
-					putChar('x');
-					printHex(va_arg(ap, UInt32), 4);
-					break;
-				case 'd':
-					// Hex double
-					putChar('0');
-					putChar('x');
-					printHex(va_arg(ap, UInt32), 8);
+				case 'c':
+					// Character
+					putChar((char)va_arg(ap, int));
 					break;
 			}
 		} else putChar(*p);
@@ -147,7 +159,7 @@ void clearScreen() {
 
 void printCenter(const char* string) {
 	vga_cursor += (VGA_WIDTH / 2) - (strlen(string) / 2);
-	print(string);
+	printf(string);
 }
 
 void panic(const char* message) {
@@ -168,7 +180,7 @@ void panic(const char* message) {
 
 void error(const char* message) {
 	vga_setColor(0xc, 0x0);
-	print("Error: %s", message);
+	printf("Error: %s", message);
 	vga_setColor(0x7, 0x0);
 }
 

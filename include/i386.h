@@ -2,6 +2,7 @@
 
 #include <types.h>
 #include <assert.h>
+#include <pic.h>
 #include <vga.h>
 
 #define IRQ_VECTOR_BASE 0x20

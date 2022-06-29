@@ -34,5 +34,4 @@ clean:
 	@rm -f $(OBJS) build/kernel.bin build/boot.bin
 
 run:
-	@echo Running emulator
 	@qemu-system-i386 -drive format=raw,file=build/disk.img,if=floppy -rtc base=localtime -name FOSOS

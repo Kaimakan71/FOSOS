@@ -15,4 +15,5 @@
 void pic_enable(UInt8 vector);
 void pic_disable(UInt8 vector);
 void pic_eoi(UInt8 vector);
+void pic_dumpRegs();
 void pic_init();

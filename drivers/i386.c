@@ -48,40 +48,41 @@ void registerUserInterruptHandler(UInt8 vector, void (*f)()) {
 	idt_flush();
 }
 
-#define EH(i, msg) \
+#define CPUPANIC(i, msg) \
 	static void _exception ## i () \
 	{ \
-		vga_setColor(0xa, 0x0); \
-		print(msg"\n"); \
 		dword cr0, cr2, cr3, cr4; \
 		asm("movl %%cr0, %%eax":"=a"(cr0)); \
 		asm("movl %%cr2, %%eax":"=a"(cr2)); \
 		asm("movl %%cr3, %%eax":"=a"(cr3)); \
 		asm("movl %%cr4, %%eax":"=a"(cr4)); \
-		print("CR0=%x CR2=%x CR3=%x CR4=%x\n", cr0, cr2, cr3, cr4); \
+		panic("CPU exception: " msg); \
+		printf("CR0=%x CR2=%x CR3=%x CR4=%x\n", cr0, cr2, cr3, cr4); \
 		hang(); \
 	}
 
-EH(0, "Divide error")
-EH(1, "Debug exception")
-EH(2, "Unknown error")
-EH(3, "Breakpoint")
-EH(4, "Overflow")
-EH(5, "Bounds check")
-EH(6, "Invalid opcode")
-EH(7, "Coprocessor not available")
-EH(8, "Double fault")
-EH(9, "Coprocessor segment overrun")
-EH(10, "Invalid TSS")
-EH(11, "Segment not present")
-EH(12, "Stack exception")
-EH(13, "General protection fault")
-EH(14, "Page fault")
-EH(15, "Unknown error")
-EH(16, "Coprocessor error")
+CPUPANIC(0, "Divide error")
+CPUPANIC(1, "Debug exception")
+CPUPANIC(2, "Unknown error")
+CPUPANIC(3, "Breakpoint")
+CPUPANIC(4, "Overflow")
+CPUPANIC(5, "Bounds check")
+CPUPANIC(6, "Invalid opcode")
+CPUPANIC(7, "Coprocessor not available")
+CPUPANIC(8, "Double fault")
+CPUPANIC(9, "Coprocessor segment overrun")
+CPUPANIC(10, "Invalid TSS")
+CPUPANIC(11, "Segment not present")
+CPUPANIC(12, "Stack exception")
+CPUPANIC(13, "General protection fault")
+CPUPANIC(14, "Page fault")
+CPUPANIC(15, "Unknown error")
+CPUPANIC(16, "Coprocessor error")
 
 static void unimp_trap() {
-	print("Unhandled IRQ");
+	panic("Unhandled IRQ: No handler registered");
+	// Hopefully IRR or ISR will tell us which IRQ was unhandled
+	pic_dumpRegs();
 	hang();
 }
 
