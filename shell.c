@@ -34,6 +34,8 @@ int $help(int argc, char* argv[]) {
 
 	printf(
 		"help     - prints this message\n"
+		"read     - dumps part of fs.img\n"
+		"write    - writes a specified string to fs.img\n"
 		"pwd      - prints the current working directory\n"
 		"realpath - get the full path of a file\n"
 		"clear    - clears the screen\n"
@@ -118,6 +120,19 @@ int $banner() {
 
 int invoke(int argc, char* argv[]) {
 	if(streq(argv[0], "help")) return $help(argc, argv);
+	if(streq(argv[0], "read")) {
+		byte buffer[512];
+		ide_read(0, 1, buffer);
+		printf((char*)buffer);
+		putChar('\n');
+		return 0;
+	}
+	if(streq(argv[0], "write")) {
+		byte buffer[512];
+		strcpy((char*)buffer, argv[1]);
+		ide_write(0, 1, buffer);
+		return 0;
+	}
 	if(streq(argv[0], "pwd")) return $pwd(argc, argv);
 	if(streq(argv[0], "realpath")) return $realpath(argc, argv);
 	if(streq(argv[0], "clear")) return $clear(argc, argv);

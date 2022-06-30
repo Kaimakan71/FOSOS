@@ -2,3 +2,5 @@
 *.o
 # Binaries other than disk image
 build/*.bin
+# Filesystem image
+build/fs.img

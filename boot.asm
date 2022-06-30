@@ -51,8 +51,8 @@ mov cr0, eax
 
 jmp 8:initProtected
 
-bootMsg: db "Loading kernel...", 13, 10, 0
-diskErrorMsg: db "A disk read error occurred.", 13, 10, 0
+bootMsg: db "[LDR] Loading kernel...", 13, 10, 0
+diskErrorMsg: db "[LDR] A disk read error occurred", 13, 10, 0
 
 print:
 	mov ah, 0x0e
@@ -105,20 +105,14 @@ initProtected:
     mov gs, ax
 
     mov esp, 0x10000 ; Set up a 32-bit stack
+
 	xor eax, eax
 checkA20: ; Check that A20 actually got enabled
 	inc eax
 	mov [0x00000000], eax
 	cmp [0x10000000], eax
 	je checkA20
-check387: ; Check if a 387 math coprocessor is available
-	mov eax, cr0
-	and eax, 0x80000011
-	test eax, 0x10
-	jne has387
-	or eax, 4 ; No 387, set emulate bit
-has387:
-	mov cr0, eax
+
     jmp 0x10000 ; Jump to the kernel
 
 times 510-($-$$) db 0 ; Make sure this is one sector (boot sector)

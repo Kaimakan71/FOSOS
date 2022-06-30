@@ -171,6 +171,7 @@ void clearScreen() {
 		vga_mem[i * 2 + 1] = 0x07;
 	}
 	vga_cursor = 0;
+	vga_updateCursor();
 }
 
 void printCenter(const char* string) {

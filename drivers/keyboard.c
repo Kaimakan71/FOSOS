@@ -55,7 +55,10 @@ void handle_keyboard() {
 			case 0x2A: kbd_modifiers |= KBD_MOD_SHIFT; break;
 			case 0xAA: kbd_modifiers &= ~KBD_MOD_SHIFT; break;
 			case 0xFA: /* i8042 ack */ break;
-			case 0x1c: /* Enter pressed, notify shell */ shell_handleInput(); break;
+			case 0x1c:
+				/* Enter pressed, notify shell */
+				shell_handleInput();
+				break;
 			case 0x0e:
 				/* Backspace pressed */
 				// If at start of line, ignore keypress
@@ -67,7 +70,6 @@ void handle_keyboard() {
 				vga_updateCursor();
 				clearChar(vga_cursor);
 				shell_inbuf[shell_inbufPos] = 0;
-
 				break;
 			default:
 				// Key depressed

@@ -7,28 +7,36 @@ SECTIONS
 	. = 0x10000;
 
 	/* Executable code first */
-	.text BLOCK(4K) : ALIGN(4K)
+	.text :
 	{
 		_start.o
 		*(.text)
 	}
 
 	/* Read-only data */
-	.rodata BLOCK(4K) : ALIGN(4K)
+	.rodata :
 	{
 		*(.rodata)
 	}
 
 	/* Initialized read/write data */
-	.data BLOCK(4K) : ALIGN(4K)
+	.data :
 	{
 		*(.data)
 	}
 
 	/* Uninitialized read/write data and stack */
-	.bss BLOCK(4K) : ALIGN(4K)
+	.bss :
 	{
 		*(COMMON)
 		*(.bss)
+		*(.stack)
+	}
+
+	/DISCARD/ :
+	{
+		*(.comment)
+		*(.eh_frame)
+		*(.note.gnu.build-id)
 	}
 }

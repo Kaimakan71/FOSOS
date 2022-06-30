@@ -11,6 +11,7 @@
 #include <ports.h>
 #include <pit.h>
 #include <rtc.h>
+#include <ide.h>
 #include <vga.h>
 
 typedef struct {

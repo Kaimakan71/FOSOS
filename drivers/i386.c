@@ -127,7 +127,7 @@ void idt_init() {
 	registerInterruptHandler(0x0f, _exception15);
 	registerInterruptHandler(0x10, _exception16);
 
-	registerInterruptHandler(0x57, irq7_handler);
+	registerInterruptHandler(IRQ_VECTOR_BASE + 7, irq7_handler);
 
 	idt_flush();
 }
