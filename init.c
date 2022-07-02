@@ -31,8 +31,8 @@ void init() {
 	idt_init();
 
 	// Register interrupt handlers / initialize drivers
-	pit_init();
 	kbd_init();
+	pit_init();
 
 	debugf("[KRN] Initialization complete, starting shell\n");
 
