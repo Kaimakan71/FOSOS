@@ -56,6 +56,7 @@ void* MALLOC kmalloc(UInt32 amount) {
 					total_free -= allocation->amount * HEAP_BLOCK;
 
 					printf("[MEM] Malloc: %u used, %u free\n", total_allocated, total_free);
+					debugf("[MEM] Malloc\n");
 
 					return ptr;
 				}
@@ -87,6 +88,7 @@ void kfree(void* ptr) {
 	memset(allocation, 0, allocation->amount * HEAP_BLOCK);
 
 	printf("[MEM] Free: %u used, %u free\n", total_allocated, total_free);
+	debugf("[MEM] Free\n");
 }
 
 void mem_init() {

@@ -42,5 +42,5 @@ void pit_init() {
 
 	registerInterruptHandler(IRQ_VECTOR_BASE + IRQ_TIMER, tick_isr);
 	pic_enable(IRQ_TIMER);
-	printf("[PIT] i8253 timer initialized: %uHz square wave\n", TICKS_PER_SECOND);
+	debugf("[PIT] i8253 timer initialized: 600Hz square wave\n");
 }

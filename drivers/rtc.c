@@ -33,5 +33,5 @@ void rtc_init() {
 	mode |= 2; // 24hr mode
 	mode |= 4; // No BCD
 	cmos_write(0x0b, mode);
-	printf("[RTC] Real-time clock initialized: 24hr mode, no BCD\n");
+	debugf("[RTC] Real-time clock initialized: 24hr mode, no BCD\n");
 }

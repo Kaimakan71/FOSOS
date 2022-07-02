@@ -38,4 +38,5 @@ void printCenter(const char* string);
 void panic(const char* message);
 void error(const char* message);
 
+void debugf(const char* msg);
 void vga_init();

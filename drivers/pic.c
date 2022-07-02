@@ -73,5 +73,5 @@ void pic_init() {
 
 	// Enable the master-slave communication line
 	pic_enable(SLAVE_INDEX);
-	printf("[PIC] i8259 initialized: cascading mode, vector bases %b/%b\n", PIC0_VECTOR_BASE, PIC1_VECTOR_BASE);
+	debugf("[PIC] i8259 initialized: 8086 cascading mode\n");
 }

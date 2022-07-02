@@ -27,9 +27,9 @@ xor dh, dh
 int 0x13
 
 ; Check carry and return code for errors
-jc error
+jc diskError
 cmp ah, 0
-jne error
+jne diskError
 
 cli ; Disable interrupts
 
@@ -51,8 +51,8 @@ mov cr0, eax
 
 jmp 8:initProtected
 
-bootMsg: db "[LDR] Loading kernel...", 13, 10, 0
-errorMsg: db "[LDR] Boot error!", 13, 10, 0
+bootMsg: db "Loading kernel...", 13, 10, 0
+diskErrorMsg: db "A disk read error occurred.", 13, 10, 0
 
 print:
 	mov ah, 0x0e
@@ -68,8 +68,8 @@ print:
 	print_exit:
 		ret
 
-error:
-	mov si, errorMsg
+diskError:
+	mov si, diskErrorMsg
 	call print
 
 	cli ; No interrupts

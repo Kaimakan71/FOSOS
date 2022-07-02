@@ -40,4 +40,4 @@ clean:
 	@rm -f $(OBJS) build/kernel.bin build/boot.bin
 
 run:
-	@qemu-system-i386 -drive format=raw,file=build/disk.img,if=floppy -m 1M -rtc base=localtime -name FOSOS
+	@qemu-system-i386 -drive format=raw,file=build/disk.img,if=floppy -m 1M -rtc base=localtime -serial stdio -name FOSOS

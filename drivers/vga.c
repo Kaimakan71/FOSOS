@@ -209,6 +209,10 @@ void error(const char* message) {
 	vga_setColor(0x7, 0x0);
 }
 
+void debugf(const char* msg) {
+	while(*msg) outb(0x3f8, *msg++);
+}
+
 void vga_init() {
 	vga_cursor = vga_getCursor();
 }

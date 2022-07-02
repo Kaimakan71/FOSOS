@@ -19,7 +19,7 @@
 void init() {
 	// Initialize things we need for debugging
 	vga_init();
-	printf("[KRN] Starting FOSOS 1.0\n");
+	debugf("[KRN] Starting FOSOS 1.0\n");
 
 	// Initialize memory manager and real-time clock
 	mem_init();
@@ -34,7 +34,7 @@ void init() {
 	pit_init();
 	kbd_init();
 
-	printf("[KRN] Initialization complete, starting shell\n");
+	debugf("[KRN] Initialization complete, starting shell\n");
 
 	// Initialize the shell
 	shell_init();
