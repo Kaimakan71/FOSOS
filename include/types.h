@@ -20,9 +20,16 @@ typedef byte UInt8;
 typedef word UInt16;
 typedef dword UInt32;
 
+typedef int PID;
+
 typedef UInt8 bool;
 #define true 1
 #define false 0
+
+#define NULL 0
+#define nullptr (void*)NULL
+
+#define divUp(a, b) (a + b - 1) / b
 
 #define LSW(x) ((UInt32)(x) & 0xFFFF)
 #define MSW(x) (((UInt32)(x) >> 16) & 0xFFFF)

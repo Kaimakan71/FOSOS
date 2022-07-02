@@ -11,7 +11,6 @@
 #include <ports.h>
 #include <pit.h>
 #include <rtc.h>
-#include <ide.h>
 #include <vga.h>
 
 typedef struct {
@@ -20,6 +19,7 @@ typedef struct {
 	char path[256];
 	UInt32 uptime;
 	UInt16 memory; // In KiB
+	UInt32 processCount;
 } System;
 extern System system;
 

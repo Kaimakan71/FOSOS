@@ -3,23 +3,21 @@
 # Copyright (c) 2022, the FOSOS developers.
 # SPDX-License-Identifier: BSD-2-Clause
 
-FS_SIZE=8K
-
 OBJS = \
 	_start.o \
 	init.o \
 	stdlib.o \
+	mem.o \
 	drivers/ports.o \
 	drivers/vga.o \
-	drivers/pic.o \
-	drivers/i386.o \
-	drivers/keyboard.o \
 	drivers/rtc.o \
+	drivers/i386.o \
+	drivers/pic.o \
 	drivers/pit.o \
-	drivers/ide.o \
+	drivers/keyboard.o \
 	shell.o
 
-all: build/disk.img build/fs.img
+all: build/disk.img
 
 build/disk.img: build/boot.bin build/kernel.bin
 	@echo "Creating disk image"
@@ -41,12 +39,5 @@ clean:
 	@echo "Cleaning"
 	@rm -f $(OBJS) build/kernel.bin build/boot.bin
 
-build/fs.img:
-	@qemu-img create build/fs.img $(FS_SIZE)
-
-reset_fs:
-	@rm -f build/fs.img
-	@qemu-img create build/fs.img $(FS_SIZE)
-
 run:
-	@qemu-system-i386 -drive format=raw,file=build/disk.img,if=floppy -drive format=raw,file=build/fs.img -m 1M -rtc base=localtime -name FOSOS
+	@qemu-system-i386 -drive format=raw,file=build/disk.img,if=floppy -m 1M -rtc base=localtime -name FOSOS

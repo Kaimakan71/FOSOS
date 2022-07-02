@@ -157,6 +157,14 @@ void printf(const char* fmt, ... ) {
 					// Character
 					putChar((char)va_arg(ap, int));
 					break;
+				case 'p':
+					// Number - padded to 2 characters
+					{
+						UInt32 value = va_arg(ap, UInt32);
+						if(value < 10) putChar('0');
+						printUInt(value);
+					}
+					break;
 			}
 		} else putChar(*p);
 	}

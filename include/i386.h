@@ -42,6 +42,12 @@ typedef union {
 	};
 } PACKED Descriptor;
 
+Descriptor* getGDTEntry(UInt16 selector);
+UInt16 allocateGDTEntry();
+void writeGDTEntry(UInt16 selector, Descriptor desc);
+void setDescriptorBase(Descriptor* desc, void* base);
+void setDescriptorLimit(Descriptor* desc, UInt32 limit);
+void flushGDT();
 void gdt_init();
 void registerInterruptHandler(UInt8 vector, void (*f)());
 void registerUserInterruptHandler(UInt8 vector, void (*f)());

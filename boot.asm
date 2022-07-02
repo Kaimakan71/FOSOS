@@ -27,9 +27,9 @@ xor dh, dh
 int 0x13
 
 ; Check carry and return code for errors
-jc diskError
+jc error
 cmp ah, 0
-jne diskError
+jne error
 
 cli ; Disable interrupts
 
@@ -52,7 +52,7 @@ mov cr0, eax
 jmp 8:initProtected
 
 bootMsg: db "[LDR] Loading kernel...", 13, 10, 0
-diskErrorMsg: db "[LDR] A disk read error occurred", 13, 10, 0
+errorMsg: db "[LDR] Boot error!", 13, 10, 0
 
 print:
 	mov ah, 0x0e
@@ -68,8 +68,8 @@ print:
 	print_exit:
 		ret
 
-diskError:
-	mov si, diskErrorMsg
+error:
+	mov si, errorMsg
 	call print
 
 	cli ; No interrupts
@@ -104,14 +104,7 @@ initProtected:
     mov fs, ax
     mov gs, ax
 
-    mov esp, 0x10000 ; Set up a 32-bit stack
-
-	xor eax, eax
-checkA20: ; Check that A20 actually got enabled
-	inc eax
-	mov [0x00000000], eax
-	cmp [0x10000000], eax
-	je checkA20
+    mov esp, 0x1fff ; Set up a 32-bit stack
 
     jmp 0x10000 ; Jump to the kernel
 

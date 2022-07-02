@@ -9,6 +9,20 @@ A simple 32-bit command-line operating system base for developers written in C. 
 * C bug help :~) - [CoherenceLabs](https://github.com/CoherenceLabs)
 * Helpful articles/tutorials - [OSDev Wiki](https://wiki.osdev.org)
 
+## Todo :~)
+###### Note: these are in order of priority
+- [x] VGA text mode driver
+- [x] (US) Keyboard driver
+- [x] Real-time clock and interval timer drivers
+- [x] Basic commands
+- [ ] Serial driver (printf to host console)
+- [ ] Filesystem (start virtual?)
+- [ ] Networking (E1000 adapter?)
+- [ ] TCP/IP, HTTP/FTP stack (+ custom protocol?)
+- [ ] Multitasking
+- [ ] Disk driver
+- [ ] GUI (design?)
+
 ## Prerequisites
 * [NASM](https://www.nasm.us) (assembler)
 * [QEMU](https://www.qemu.org) (emulator)

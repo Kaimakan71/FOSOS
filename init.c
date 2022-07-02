@@ -13,7 +13,7 @@
 #include <i386.h>
 #include <keyboard.h>
 #include <pit.h>
-#include <ide.h>
+#include <mem.h>
 #include <shell.h>
 
 void init() {
@@ -21,7 +21,8 @@ void init() {
 	vga_init();
 	printf("[KRN] Starting FOSOS 1.0\n");
 
-	// Initialize the real-time clock
+	// Initialize memory manager and real-time clock
+	mem_init();
 	rtc_init();
 
 	// Initialize the Programmable Interrupt Controller and CPU tables
@@ -30,9 +31,8 @@ void init() {
 	idt_init();
 
 	// Register interrupt handlers / initialize drivers
-	kbd_init();
 	pit_init();
-	ide_init();
+	kbd_init();
 
 	printf("[KRN] Initialization complete, starting shell\n");
 

@@ -14,6 +14,18 @@ static Descriptor gdt[256];
 static Descriptor idt[256];
 static UInt16 gdtLength;
 
+Descriptor* getGDTEntry(UInt16 selector) {
+	UInt16 i = (selector & 0xfffc) >> 3;
+	return (Descriptor*)(&gdt[i]);
+}
+
+UInt16 allocateGDTEntry() {
+	ASSERT(gdtLength < 256);
+	UInt16 newEntry = gdtLength * 8;
+	gdtLength++;
+	return newEntry;
+}
+
 static void gdt_writeRawEntry(UInt16 selector, UInt32 low, UInt32 high) {
 	UInt16 i = (selector & 0xfffc) >> 3;
 	gdt[i].low = low;
@@ -22,6 +34,25 @@ static void gdt_writeRawEntry(UInt16 selector, UInt32 low, UInt32 high) {
 	if(i > gdtLength) {
 		gdtr.limit = (gdtLength + 1) * 8;
 	}
+}
+
+void writeGDTEntry(UInt16 selector, Descriptor desc) {
+	gdt_writeRawEntry(selector, desc.low, desc.high);
+}
+
+void setDescriptorBase(Descriptor* desc, void* base) {
+	desc->base_lo = (UInt32)(base) & 0xffff;
+	desc->base_hi = ((UInt32)(base) >> 16) & 0xff;
+	desc->base_hi2 = ((UInt32)(base) >> 24) & 0xff;
+}
+
+void setDescriptorLimit(Descriptor* desc, UInt32 limit) {
+	desc->limit_lo = (UInt32)limit & 0xffff;
+	desc->limit_hi = ((UInt32)limit >> 16) & 0xff;
+}
+
+void flushGDT() {
+	asm("lgdt %0"::"m"(gdtr));
 }
 
 void gdt_init() {
@@ -37,7 +68,7 @@ void gdt_init() {
 
 	gdtr.base = gdt;
 	gdtr.limit = (gdtLength * 8) - 1;
-	asm("lgdt %0"::"m"(gdtr));
+	flushGDT();
 }
 
 void idt_flush() {
@@ -71,7 +102,7 @@ void registerUserInterruptHandler(UInt8 vector, void (*f)()) {
 
 CPUPANIC(0, "Divide error")
 CPUPANIC(1, "Debug exception")
-CPUPANIC(2, "Unknown error")
+CPUPANIC(2, "Non-Maskable Interrupt")
 CPUPANIC(3, "Breakpoint")
 CPUPANIC(4, "Overflow")
 CPUPANIC(5, "Bounds check")

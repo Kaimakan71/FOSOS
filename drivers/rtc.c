@@ -16,13 +16,14 @@ void rtc_printDate() {
 
 	UInt8 hours = cmos_read(0x04);
 
-	printf("%s %s %u %u:%u:%u %u",
+	printf("%s %s %p %p:%p:%p %s %u",
 		dayNames[cmos_read(0x06) - 1], // Day of week
 		monthNames[cmos_read(0x08) - 1], // Month
 		cmos_read(0x07), // Day of month
 		hours > 12 ? hours-12:hours, // Hours
 		cmos_read(0x02), // Minutes
 		cmos_read(0x00), // Seconds
+		hours < 12 ? "AM":"PM",
 		(cmos_read(0x32) * 100) + cmos_read(0x09) // Century * 100 + years
 	);
 }
