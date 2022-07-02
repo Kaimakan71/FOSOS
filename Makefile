@@ -15,6 +15,7 @@ OBJS = \
 	drivers/pic.o \
 	drivers/pit.o \
 	drivers/keyboard.o \
+	drivers/pci.o \
 	shell.o
 
 all: build/disk.img

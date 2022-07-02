@@ -16,8 +16,10 @@ A simple 32-bit command-line operating system base for developers written in C. 
 - [x] Real-time clock and interval timer drivers
 - [x] Basic commands
 - [x] Serial driver (printf to host console)
+- [x] PCI driver/manager
 - [ ] Networking (E1000 adapter?)
 - [ ] Filesystem (start virtual?)
+- [ ] ACPI controller
 - [ ] TCP/IP, HTTP/FTP stack (+ custom protocol?)
 - [ ] Multitasking
 - [ ] Disk driver
