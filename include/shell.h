@@ -16,6 +16,9 @@
 typedef struct {
 	char username[32];
 	char hostname[32];
+	char sysname[16];
+	char release[16];
+	char machine[16];
 	char path[256];
 	UInt32 uptime;
 	UInt16 memory; // In KiB

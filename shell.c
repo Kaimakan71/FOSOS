@@ -34,6 +34,7 @@ int $help(int argc, char* argv[]) {
 
 	printf(
 		"help     - prints this message\n"
+		"uname    - prints system information\n"
 		"pwd      - prints the current working directory\n"
 		"realpath - get the full path of a file\n"
 		"clear    - clears the screen\n"
@@ -43,6 +44,27 @@ int $help(int argc, char* argv[]) {
 		"hostname - prints the machine's hostname\n"
 		"banner   - prints the FOSOS banner"
 	);
+	return 0;
+}
+
+int $uname(int argc, char* argv[]) {
+	for(int i = 1; i < argc; i++) {
+		if(streq(argv[i], "-s")) printf(system.sysname);
+		else if(streq(argv[i], "-n")) printf(system.hostname);
+		else if(streq(argv[i], "-r")) printf(system.release);
+		else if(streq(argv[i], "-m")) printf(system.machine);
+		else if(streq(argv[i], "-a")) {
+			printf(system.sysname);
+			putChar(' ');
+			printf(system.hostname);
+			putChar(' ');
+			printf(system.release);
+			putChar(' ');
+			printf(system.machine);
+		}
+		putChar(' ');
+	}
+
 	return 0;
 }
 
@@ -118,6 +140,7 @@ int $banner() {
 
 int invoke(int argc, char* argv[]) {
 	if(streq(argv[0], "help")) return $help(argc, argv);
+	if(streq(argv[0], "uname")) return $uname(argc, argv);
 	if(streq(argv[0], "pwd")) return $pwd(argc, argv);
 	if(streq(argv[0], "realpath")) return $realpath(argc, argv);
 	if(streq(argv[0], "clear")) return $clear(argc, argv);
@@ -180,8 +203,12 @@ void shell_reset() {
 void shell_init() {
 	// Set system defaults
 	strcpy(system.username, "kai");
+	strcpy(system.sysname, "FOSOS");
 	strcpy(system.hostname, "native");
+	strcpy(system.release, "1.0-dev");
+	strcpy(system.machine, "i386");
 	strcpy(system.path, "/");
+
 	system.uptime = 0;
 	system.memory = (cmos_read(0x16) << 8) | cmos_read(0x15);
 
