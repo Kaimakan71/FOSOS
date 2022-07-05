@@ -10,6 +10,7 @@
 #include <types.h>
 #include <ports.h>
 #include <video.h>
+#include <mouse.h>
 
 typedef struct {
 	Color primary;
@@ -19,4 +20,6 @@ typedef struct {
 	int menuHeight;
 } Theme;
 
+extern Theme theme;
+void createWindow(const char* name, int x, int y, int width, int height, Color background);
 void gui_init();

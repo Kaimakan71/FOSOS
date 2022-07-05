@@ -10,7 +10,6 @@
 IRQHANDLER(0);
 
 void handleIRQ0() {
-	// system.uptime++;
 	exitIRQHandler(IRQ_TIMER);
 }
 
@@ -23,4 +22,6 @@ void pit_init() {
 
 	registerIRQHandler(IRQ_TIMER, isr0);
 	enableIRQ(IRQ_TIMER);
+
+	debugf("i8253 PIT initialized: %uHz square wave\n", TICKS_PER_SECOND);
 }

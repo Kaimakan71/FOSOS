@@ -7,17 +7,19 @@
 
 #include <types.h>
 #include <assert.h>
-#include <video.h>
 #include <memory.h>
 #include <i8259.h>
 #include <cputable.h>
 #include <keyboard.h>
-#include <ps2mouse.h>
 #include <i8253.h>
 #include <rtc.h>
 #include <gui.h>
 
 void init() {
+	// Clear the host console
+	debugf("\033c");
+	debugf("Starting FOSOS...\n");
+
 	// Initialize the memory manager
 	memory_init();
 
@@ -26,14 +28,15 @@ void init() {
 	gdt_init();
 	idt_init();
 
-	// Register interrupt handlers / initialize drivers
+	// Initialize essential drivers
 	kbd_init();
-	ps2mouse_init();
 	pit_init();
 	rtc_init();
 
-	// Initialize the display
+	// Initialize the GUI
 	gui_init();
+
+	createWindow("Launcher", 160, 120, 320, 200, theme.primary);
 
 	// Enable interrupts
 	asm volatile("sti");

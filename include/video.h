@@ -13,8 +13,8 @@
 #include <font.h>
 
 // This info is returned by VBE and stored at physical address 0x2000
-// Deprecated - no longer used
-// Unused     - not used
+// Deprecated - no longer used by VBE
+// Unused     - not used by VBE
 // Reserved   - no meaning / for future expansion
 typedef struct {
 	word attributes;
@@ -87,6 +87,7 @@ extern uint bitDepth;
 extern byte textColor;
 extern byte textColor;
 extern uint cursorPos;
+extern UInt16 pitch;
 #define screenTop 0
 #define screenLeft 0
 #define screenBottom screenHeight
@@ -99,9 +100,7 @@ void drawHLine(uint x, uint y, uint width, Color color);
 void drawVLine(uint x, uint y, uint height, Color color);
 void fillScreen(Color color);
 void drawChar(char character, uint x, uint y, Color color);
-void clearChar(uint pos);
 void putChar(char character);
-void printf(const char* fmt, ... );
+void debugf(const char* fmt, ... );
 void error(const char* msg);
-void handleMouse(Int8 dx, Int8 dy);
 void video_init();

@@ -56,4 +56,6 @@ void pic_init() {
 
 	// Enable the master-slave communication line
 	enableIRQ(SLAVE_INDEX);
+
+	debugf("i8259 PICs initialized with vector bases %b/%b\n", PIC0_VECTOR_BASE, PIC1_VECTOR_BASE);
 }

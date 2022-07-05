@@ -13,4 +13,10 @@
 #include <cputable.h>
 #include <i8259.h>
 
+extern int mouseX;
+extern int mouseY;
+
 #define IRQ_PS2MOUSE 12
+
+void drawMouse();
+void mouse_init();

@@ -11,16 +11,6 @@ Theme theme;
 
 #define clearScreen() fillScreen(theme.secondary);
 
-void drawTaskbar() {
-	fillRect(0, screenBottom - theme.taskbarHeight, screenWidth, theme.taskbarHeight, theme.primary);
-	drawHLine(0, screenBottom - theme.taskbarHeight + 1, screenWidth, theme.tertiary);
-}
-
-void drawMenubar() {
-	fillRect(0, 0, screenWidth, theme.menuHeight, theme.primary);
-	drawHLine(0, theme.menuHeight - 2, screenWidth, theme.tertiary);
-}
-
 void drawString(const char* str, int x, int y, Color color) {
 	int i = 0;
 	while(*str) {
@@ -49,10 +39,6 @@ void drawButton(const char* text, int x, int y, int height) {
 	drawString(text, x + 4, y + 4, EGA_White);
 }
 
-void drawTaskbarButton(const char* text, int x) {
-	drawButton(text, x + 2, screenHeight - theme.taskbarHeight + 4, theme.taskbarHeight - 6);
-}
-
 void drawWindow(const char* title, int x, int y, int width, int height, Color background) {
 	fillRect(x, y, width, height, theme.primary);
 
@@ -67,16 +53,16 @@ void drawWindow(const char* title, int x, int y, int width, int height, Color ba
 	// Titlebar
 	fillRect(x + 3, y + 3, width - 6, theme.menuHeight, EGA_LBlue);
 	drawString(title, x + 7, y + 7, EGA_White);
-
-	// Close button
-	drawButton("X", x + width - 20, y + 4, 17);
 	
 	// Background
 	fillRect(x + 3, y + theme.menuHeight + 4, width - 6, height - theme.menuHeight - 6, background);
+
+	// Make sure the mouse wasn't covered
+	drawMouse();
 }
 
-void createApplication(const char* name, int x, int y, int width, int height, Color background) {
-	drawTaskbarButton(name, 0);
+void createWindow(const char* name, int x, int y, int width, int height, Color background) {
+	debugf("Creating window '%s'\n", name);
 	drawWindow(name, x, y, width, height, background);
 }
 
@@ -90,8 +76,5 @@ void gui_init() {
 	theme.menuHeight = screenHeight * 0.04;
 
 	clearScreen();
-	drawTaskbar();
-	drawMenubar();
-
-	createApplication("Shell?", 50, 50, 320, 200, VGA_Gray);
+	mouse_init();
 }

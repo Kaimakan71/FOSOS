@@ -22,7 +22,7 @@ static byte map[MAP_SIZE];
 volatile uint total_allocated = 0;
 volatile uint total_free = HEAP_SIZE;
 
-#define heapFull() printf("Cannot malloc: out of memory (heap size %u)\n", HEAP_SIZE); hang();
+#define heapFull() debugf("Cannot malloc: out of memory (heap size %u)\n", HEAP_SIZE); hang();
 
 void* malloc(uint amount) {
 	// We have to put an Allocation at the start of the block(s)
@@ -72,7 +72,7 @@ void* malloc(uint amount) {
 					// Zero the entire allocation to protect from memory randomization or previous allocation contents
 					memset(ptr, 0, bytes - sizeof(Allocation));
 
-					printf("Malloc. (%u/%u)\n", total_allocated, HEAP_SIZE);
+					debugf("Malloc. (%u/%u)\n", total_allocated, HEAP_SIZE);
 
 					return ptr;
 				}
@@ -98,10 +98,12 @@ void free(void* ptr) {
 	total_allocated -= bytes;
 	total_free += bytes;
 
-	printf("Free! (%u/%u)\n", total_allocated, HEAP_SIZE);
+	debugf("Free! (%u/%u)\n", total_allocated, HEAP_SIZE);
 }
 
 void memory_init() {
 	// Clear out the allocation map
 	memset(&map, 0, sizeof(map));
+
+	debugf("Memory manager initialized with a heap size of %uKB\n", HEAP_SIZE / 1024);
 }

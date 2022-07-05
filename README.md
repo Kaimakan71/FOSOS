@@ -16,14 +16,14 @@ A simple 32-bit command-line operating system base for developers written in C. 
 - [x] Real-time clock and interval timer drivers
 - [x] Basic commands
 - [x] Serial driver (printf to host console)
-- [x] PCI driver/manager
-- [ ] Networking (E1000 adapter?)
-- [ ] Filesystem (start virtual?)
-- [ ] ACPI controller
-- [ ] TCP/IP, HTTP/FTP stack (+ custom protocol?)
+- [x] GUI
 - [ ] Multitasking
 - [ ] Disk driver
-- [ ] GUI (design?)
+- [ ] Filesystem
+- [ ] ACPI controller
+- [ ] PCI driver/manager
+- [ ] Networking (E1000 adapter?)
+- [ ] TCP/IP, HTTP/FTP stack (+ custom protocol?)
 
 ## Prerequisites
 * [NASM](https://www.nasm.us) (assembler)

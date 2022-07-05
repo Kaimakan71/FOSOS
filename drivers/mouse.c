@@ -5,12 +5,14 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#include <ps2mouse.h>
+#include <mouse.h>
 
 uint mouseDataState = 0;
 byte mouseData[3];
 int mouseX = 320;
 int mouseY = 240;
+byte behindCursor = 0x00;
+byte cursorColor = EGA_White;
 
 IRQHANDLER(12);
 
@@ -41,8 +43,7 @@ void handleIRQ12() {
 		mouseDataState++;
 	} else if(mouseDataState == 2) {
 		mouseDataState = 0;
-		int oldX = mouseX;
-		int oldY = mouseY;
+		byte* oldPos = (byte*)(videoMemory + mouseX + (mouseY * pitch));
 
 		mouseX += (Int8)mouseData[2];
 		mouseY += (Int8)-mouseData[0];
@@ -52,14 +53,21 @@ void handleIRQ12() {
 		if(mouseY < 0) mouseY = 0;
 		else if(mouseY >= screenHeight) mouseY = screenHeight - 1;
 
-		*(byte*)(videoMemory + oldX + (oldY * 640)) = VGA_Gray + 1;
-		*(byte*)(videoMemory + mouseX + (mouseY * 640)) = EGA_White;
+		byte* newPos = (byte*)(videoMemory + mouseX + (mouseY * pitch));
+
+		*oldPos = behindCursor;
+		behindCursor = *newPos;
+		*newPos = cursorColor;
 	}
 
 	exitIRQHandler(IRQ_PS2MOUSE);
 }
 
-void ps2mouse_init() {
+void drawMouse() {
+	*(byte*)(videoMemory + mouseX + (mouseY * pitch)) = cursorColor;
+}
+
+void mouse_init() {
 	registerIRQHandler(IRQ_PS2MOUSE, isr12);
 
 	// Enable the aux port
@@ -82,5 +90,10 @@ void ps2mouse_init() {
 	byte ack2 = read();
 	ASSERT(ack2 == 0xfa);
 
+	// Draw the cursor at the current position
+	drawMouse();
+
 	enableIRQ(IRQ_PS2MOUSE);
+
+	debugf("PS2 mouse initialized at (%d, %d)\n", mouseX, mouseY);
 }

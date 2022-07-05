@@ -71,20 +71,20 @@ void gdt_init() {
 	flushGDT();
 }
 
-void idt_flush() {
+void flushIDT() {
 	asm("lidt %0"::"m"(idtr));
 }
 
 void registerInterruptHandler(UInt8 vector, void (*f)()) {
 	idt[vector].low = 0x00080000 | LSW((f));
 	idt[vector].high = ((UInt32)(f) & 0xffff0000) | 0x8e00;
-	idt_flush();
+	flushIDT();
 }
 
 void registerUserInterruptHandler(UInt8 vector, void (*f)()) {
 	idt[vector].low = 0x00080000 | LSW((f));
 	idt[vector].high = ((UInt32)(f) & 0xffff0000) | 0xee00;
-	idt_flush();
+	flushIDT();
 }
 
 #define CPUPANIC(i, msg) \
@@ -95,8 +95,8 @@ void registerUserInterruptHandler(UInt8 vector, void (*f)()) {
 		asm("movl %%cr2, %%eax":"=a"(cr2)); \
 		asm("movl %%cr3, %%eax":"=a"(cr3)); \
 		asm("movl %%cr4, %%eax":"=a"(cr4)); \
-		printf("FATAL CPU EXCEPTION: " msg "\n"); \
-		printf("CR0=%x CR2=%x CR3=%x CR4=%x\n", cr0, cr2, cr3, cr4); \
+		debugf("FATAL CPU EXCEPTION: " msg "\n"); \
+		debugf("CR0=%x CR2=%x CR3=%x CR4=%x\n", cr0, cr2, cr3, cr4); \
 		hang(); \
 	}
 
@@ -119,7 +119,7 @@ CPUPANIC(15, "Unknown error")
 CPUPANIC(16, "Coprocessor error")
 
 static void unimp_trap() {
-	printf("Unhandled IRQ: No handler registered\n");
+	debugf("Unhandled IRQ: No handler registered\n");
 	hang();
 }
 
@@ -158,5 +158,5 @@ void idt_init() {
 
 	registerInterruptHandler(IRQ_VECTOR_BASE + 7, irq7_handler);
 
-	idt_flush();
+	flushIDT();
 }

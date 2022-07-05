@@ -14,7 +14,7 @@ OBJ= \
 	arch/i386/i8259.o \
 	arch/i386/cputable.o \
 	drivers/keyboard.o \
-	drivers/ps2mouse.o \
+	drivers/mouse.o \
 	arch/i386/i8253.o \
 	drivers/rtc.o \
 	gui.o

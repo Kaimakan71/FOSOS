@@ -16,7 +16,7 @@ void rtc_printDate() {
 
 	UInt8 hours = cmos_read(0x04);
 
-	printf("%s %s %p %p:%p:%p %s %u",
+	debugf("%s %s %p %p:%p:%p %s %u",
 		dayNames[cmos_read(0x06) - 1], // Day of week
 		monthNames[cmos_read(0x08) - 1], // Month
 		cmos_read(0x07), // Day of month
@@ -33,4 +33,6 @@ void rtc_init() {
 	mode |= 2; // 24hr mode
 	mode |= 4; // No BCD
 	cmos_write(0x0b, mode);
+	
+	debugf("RTC initialized in 24-hour mode with no BCD\n");
 }

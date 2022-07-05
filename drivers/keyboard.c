@@ -44,10 +44,9 @@ void handleIRQ1() {
 
 				if(!kbd_modifiers) character = map_us[character];
 				else if(kbd_modifiers & KBD_MOD_SHIFT) character = map_us_shift[character];
-
-				putChar(character);
 		}
 	}
+
 	exitIRQHandler(IRQ_KEYBOARD);
 }
 

@@ -13,6 +13,7 @@ byte* videoMemory;
 uint screenWidth;
 uint screenHeight;
 uint bitDepth;
+UInt16 pitch;
 
 const char hexChars[16] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 uint cursorPos = 0;
@@ -25,7 +26,7 @@ uint charsPerLine;
 void fillRect(uint x, uint y, uint width, uint height, Color color) {
 	for(uint iy = 0; iy < height; iy++) {
 		for(uint ix = 0; ix < width; ix++) {
-			*(videoMemory + x + ix + ((y + iy) * mode->pitch)) = color;
+			*(videoMemory + x + ix + ((y + iy) * pitch)) = color;
 		}
 	}
 }
@@ -34,7 +35,7 @@ void fillRect(uint x, uint y, uint width, uint height, Color color) {
 // Only uses one loop, instead of two
 // Also has less calculations to make
 void fillScreen(Color color) {
-	for(uint i = 0; i < (mode->pitch * mode->height); i++) {
+	for(uint i = 0; i < (pitch * screenHeight); i++) {
 		*(videoMemory + i) = color;
 	}
 }
@@ -42,14 +43,14 @@ void fillScreen(Color color) {
 // Draw a perfectly flat horizontal line
 void drawHLine(uint x, uint y, uint width, Color color) {
 	for(uint i = 0; i < width; i++) {
-		*(videoMemory + x + i + (y * mode->pitch)) = color;
+		*(videoMemory + x + i + (y * pitch)) = color;
 	}
 }
 
 // Draw a perfectly flat vertical line
 void drawVLine(uint x, uint y, uint height, Color color) {
 	for(uint i = 0; i < height; i++) {
-		*(videoMemory + x + ((y + i) * mode->pitch)) = color;
+		*(videoMemory + x + ((y + i) * pitch)) = color;
 	}
 }
 
@@ -58,23 +59,13 @@ void drawChar(char character, uint x, uint y, Color color) {
 	for(uint iy = 0; iy < charHeight; iy++) {
 		for(uint ix = 0; ix < charWidth; ix++) {
 			if((character - 33 >= 0) && ((font[character - 33][iy] >> ix) & 1)) {
-				*(videoMemory + x + (charWidth - ix - 1) + ((y + iy) * mode->pitch)) = color;
+				*(videoMemory + x + (charWidth - ix - 1) + ((y + iy) * pitch)) = color;
 			}
 		}
 	}
 }
 
-void clearChar(uint pos) {
-	fillRect((pos % charsPerLine) * charWidth, (pos / charsPerLine ) * (charHeight + lineSpacing), charWidth, charHeight, VGA_Gray + 1);
-}
-
-void putChar(char character) {
-	uint pos = cursorPos * charWidth;
-	if(character == '\n') cursorPos += charsPerLine - (cursorPos % charsPerLine) - 1;
-	else if(character == '\r') cursorPos -= cursorPos % charsPerLine;
-	else drawChar(character, pos % screenWidth, (pos / screenWidth) * charHeight + (lineSpacing * (cursorPos / charsPerLine)), textColor);
-	cursorPos++;
-}
+#define putChar(character) outb(0x3f8, character);
 
 void printUInt(UInt32 number) {
 	UInt32 divisor = 1000000000;
@@ -110,7 +101,7 @@ void printHex(UInt32 number, UInt8 fields) {
 	}
 }
 
-void printf(const char* fmt, ... ) {
+void debugf(const char* fmt, ... ) {
 	const char* p;
 	va_list ap;
 	va_start(ap, fmt);
@@ -170,7 +161,7 @@ void printf(const char* fmt, ... ) {
 
 void error(const char* msg) {
 	textColor = EGA_LRed;
-	printf("Error: %s", msg);
+	debugf("Error: %s", msg);
 	textColor = EGA_LGray;
 }
 
@@ -183,4 +174,12 @@ void video_init() {
 	screenHeight = mode->height;
 	bitDepth     = mode->bpp;
 	charsPerLine = screenWidth / charWidth;
+	pitch        = mode->pitch;
+
+	debugf("Using %ux%ux%ubpp VBE framebuffer @%x\n",
+		screenWidth,
+		screenHeight,
+		bitDepth,
+		videoMemory
+	);
 }
