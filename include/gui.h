@@ -1,5 +1,5 @@
 /**
- * FOSOS real-time clock driver
+ * FOSOS GUI routines
  *
  * Copyright (c) 2022, the FOSOS developers.
  * SPDX-License-Identifier: BSD-2-Clause
@@ -11,5 +11,12 @@
 #include <ports.h>
 #include <video.h>
 
-void rtc_printDate();
-void rtc_init();
+typedef struct {
+	Color primary;
+	Color secondary;
+	Color tertiary;
+	int taskbarHeight;
+	int menuHeight;
+} Theme;
+
+void gui_init();

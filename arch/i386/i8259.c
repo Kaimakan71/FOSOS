@@ -5,9 +5,9 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#include <pic.h>
+#include <i8253.h>
 
-void pic_disable(UInt8 vector) {
+void disableIRQ(UInt8 vector) {
 	byte imr;
 	if(vector & 8) {
 		imr = inb(PIC1_DAT);
@@ -20,7 +20,7 @@ void pic_disable(UInt8 vector) {
 	}
 }
 
-void pic_enable(UInt8 vector) {
+void enableIRQ(UInt8 vector) {
 	byte imr;
 	if(vector & 8) {
 		imr = inb(PIC1_DAT);
@@ -31,23 +31,6 @@ void pic_enable(UInt8 vector) {
 		imr &= ~(1 << vector);
 		outb(PIC0_DAT, imr);
 	}
-}
-
-void pic_eoi(UInt8 vector) {
-	if(vector & 8) outb(PIC1_CMD, 0x20);
-	outb(PIC0_CMD, 0x20);
-}
-
-// Dump the IRR and ISR registers
-// I think this works?
-void pic_dumpRegs() {
-	outb(PIC0_CMD, 0x0a);
-	outb(PIC1_CMD, 0x0a);
-	byte irr = (inb(PIC1_CMD) << 8) | inb(PIC0_CMD);
-	outb(PIC0_CMD, 0x0b);
-	outb(PIC1_CMD, 0x0b);
-	byte isr = (inb(PIC1_CMD) << 8) | inb(PIC0_CMD);
-	printf("IRR=%x ISR=%x", irr, isr);
 }
 
 void pic_init() {
@@ -72,6 +55,5 @@ void pic_init() {
 	outb(PIC1_DAT, 0xff);
 
 	// Enable the master-slave communication line
-	pic_enable(SLAVE_INDEX);
-	debugf("[PIC] i8259 initialized: 8086 cascading mode\n");
+	enableIRQ(SLAVE_INDEX);
 }

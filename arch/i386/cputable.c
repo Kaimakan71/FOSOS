@@ -6,7 +6,7 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#include <i386.h>
+#include <cputable.h>
 
 static DTR gdtr;
 static DTR idtr;
@@ -95,7 +95,7 @@ void registerUserInterruptHandler(UInt8 vector, void (*f)()) {
 		asm("movl %%cr2, %%eax":"=a"(cr2)); \
 		asm("movl %%cr3, %%eax":"=a"(cr3)); \
 		asm("movl %%cr4, %%eax":"=a"(cr4)); \
-		panic("CPU exception: " msg); \
+		printf("FATAL CPU EXCEPTION: " msg "\n"); \
 		printf("CR0=%x CR2=%x CR3=%x CR4=%x\n", cr0, cr2, cr3, cr4); \
 		hang(); \
 	}
@@ -119,9 +119,7 @@ CPUPANIC(15, "Unknown error")
 CPUPANIC(16, "Coprocessor error")
 
 static void unimp_trap() {
-	panic("Unhandled IRQ: No handler registered");
-	// Hopefully IRR or ISR will tell us which IRQ was unhandled
-	pic_dumpRegs();
+	printf("Unhandled IRQ: No handler registered\n");
 	hang();
 }
 

@@ -3,42 +3,38 @@
 # Copyright (c) 2022, the FOSOS developers.
 # SPDX-License-Identifier: BSD-2-Clause
 
-OBJS = \
+OBJ= \
 	_start.o \
 	init.o \
+	drivers/video.o \
+	font.o \
 	stdlib.o \
-	mem.o \
-	drivers/ports.o \
-	drivers/vga.o \
-	drivers/rtc.o \
-	drivers/i386.o \
-	drivers/pic.o \
-	drivers/pit.o \
+	memory.o \
+	arch/i386/ports.o \
+	arch/i386/i8259.o \
+	arch/i386/cputable.o \
 	drivers/keyboard.o \
-	drivers/pci.o \
-	shell.o
+	drivers/ps2mouse.o \
+	arch/i386/i8253.o \
+	drivers/rtc.o \
+	gui.o
 
 all: build/disk.img
 
 build/disk.img: build/boot.bin build/kernel.bin
-	@echo "Creating disk image"
-	@cat build/boot.bin build/kernel.bin > build/disk.img
+	@echo "Creating disk image"; cat build/boot.bin build/kernel.bin > build/disk.img
 
-build/kernel.bin: $(OBJS)
-	@echo "Linking object files"
-	@ld -Tbuild/linker.ld --strip-debug -melf_i386 --gc-sections --build-id=none -z norelro -z now -Ttext 0x10000 -o build/kernel.bin $(OBJS)
+build/boot.bin: arch/i386/boot.asm
+	@echo "Assembling bootloader"; nasm arch/i386/boot.asm -f bin -o build/boot.bin
 
-build/boot.bin: boot.asm
-	@echo "Assembling bootloader"
-	@nasm boot.asm -f bin -o build/boot.bin
+build/kernel.bin: $(OBJ)
+	@echo "Linking object files"; ld -T build/linker.ld --strip-debug -melf_i386 --gc-sections --build-id=none -z norelro -z now -o build/kernel.bin -Ttext 0x10000 $(OBJ)
 
 .c.o:
-	@echo "Compiling $<"
-	@gcc -Iinclude -Wextra -Wall -Wundef -Wcast-qual -Wwrite-strings -Wno-unused-parameter -Os -fno-pie -fno-asynchronous-unwind-tables -ffreestanding -fno-stack-protector -fno-ident -fomit-frame-pointer -mregparm=3 -march=i386 -m32 -fno-exceptions -ffunction-sections -fdata-sections -fmerge-all-constants -fno-unroll-loops -fno-align-functions -fno-align-jumps -fno-align-loops -nostdinc -nostdlib -Wl,-z,noseparate-code,--build-id=none -o $@ -c $<
+	@echo "Compiling $<"; gcc -Wextra -Wall -Wundef -Wcast-qual -Wwrite-strings -Wno-unused-parameter -Os -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -ffreestanding -fno-stack-protector -fno-ident -fno-builtin -mregparm=3 -march=i386 -m32 -fno-exceptions -fmerge-all-constants -fno-unroll-loops -fno-pie -fno-pic -nostdinc -nostdlib -Iinclude -o $@ -c $<
 
 clean:
-	@echo "Cleaning"
-	@rm -f $(OBJS) build/kernel.bin build/boot.bin
+	@echo "Cleaning"; rm -f build/boot.bin build/kernel.bin $(OBJ)
 
 run:
 	@qemu-system-i386 -drive format=raw,file=build/disk.img,if=floppy -m 1M -rtc base=localtime -serial stdio -name FOSOS

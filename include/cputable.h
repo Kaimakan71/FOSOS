@@ -10,10 +10,8 @@
 
 #include <types.h>
 #include <assert.h>
-#include <pic.h>
-#include <vga.h>
-
-#define IRQ_VECTOR_BASE 0x20
+#include <i8259.h>
+#include <video.h>
 
 typedef struct {
 	UInt16 limit;
@@ -42,6 +40,28 @@ typedef union {
 	};
 } PACKED Descriptor;
 
+#define IRQHANDLER(i) \
+	extern void handleIRQ ## i (); \
+	extern void isr ## i (); \
+	asm( \
+	".globl isr" #i "\n" \
+	"isr" #i ":\n" \
+	"    pusha\n" \
+	"    pushw %ds\n" \
+	"    pushw %es\n" \
+	"    pushw %fs\n" \
+	"    pushw %gs\n" \
+	"    mov %esp, %eax\n" \
+	"    call handleIRQ" #i "\n" \
+	"    popw %gs\n" \
+	"    popw %fs\n" \
+	"    popw %es\n" \
+	"    popw %ds\n" \
+	"    popa\n" \
+	"    iret\n" \
+);
+
+
 Descriptor* getGDTEntry(UInt16 selector);
 UInt16 allocateGDTEntry();
 void writeGDTEntry(UInt16 selector, Descriptor desc);
@@ -51,6 +71,5 @@ void flushGDT();
 void gdt_init();
 void registerInterruptHandler(UInt8 vector, void (*f)());
 void registerUserInterruptHandler(UInt8 vector, void (*f)());
+#define registerIRQHandler(i, h) registerInterruptHandler(IRQ_VECTOR_BASE + i, h);
 void idt_init();
-
-#define enableInterrupts() asm volatile("sti");

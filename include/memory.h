@@ -1,5 +1,5 @@
 /**
- * FOSOS real-time clock driver
+ * FOSOS memory manager
  *
  * Copyright (c) 2022, the FOSOS developers.
  * SPDX-License-Identifier: BSD-2-Clause
@@ -8,8 +8,10 @@
 #pragma once
 
 #include <types.h>
-#include <ports.h>
 #include <video.h>
+#include <cputable.h>
+#include <stdlib.h>
 
-void rtc_printDate();
-void rtc_init();
+void* malloc(uint amount);
+void free(void* ptr);
+void memory_init();

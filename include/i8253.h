@@ -9,8 +9,9 @@
 
 #include <types.h>
 #include <ports.h>
-#include <pic.h>
-#include <shell.h>
+#include <video.h>
+#include <cputable.h>
+#include <i8259.h>
 
 #define IRQ_TIMER 0
 

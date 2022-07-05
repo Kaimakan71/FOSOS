@@ -9,24 +9,23 @@
 
 System system;
 
-char shell_inbuf[256];
-UInt8 shell_inbufPos;
+char* shell_inbuf;
+uint shell_inbufPos;
 
 void shell_prompt() {
-	vga_setColor(0xa, 0x0);
+	textColor = EGA_LGreen;
 	printf(system.username);
-	vga_setColor(0x7, 0x0);
+	textColor = EGA_LGray;
 	putChar('@');
-	vga_setColor(0xf, 0x0);
+	textColor = EGA_White;
 	printf(system.hostname);
-	vga_setColor(0x7, 0x0);
+	textColor = EGA_LGray;
 	putChar(':');
-	vga_setColor(0xb, 0x0);
+	textColor = EGA_LCyan;
 	printf(system.path);
-	vga_setColor(0x7, 0x0);
+	textColor = EGA_LGray;
 	putChar('>');
 	putChar(' ');
-	vga_updateCursor();
 }
 
 int $help(int argc, char* argv[]) {
@@ -44,6 +43,7 @@ int $help(int argc, char* argv[]) {
 		"hostname - prints the machine's hostname\n"
 		"banner   - prints the FOSOS banner"
 	);
+
 	return 0;
 }
 
@@ -130,9 +130,9 @@ int $hostname(int argc, char* argv[]) {
 
 // Print a banner in a bright color
 int $banner() {
-	vga_setColor(0xf, 0x0);
+	textColor = EGA_White;
 	printf("    dBBBBP dBBBBP.dBBBBP   dBBBBP.dBBBBP\n   dBP    dB'.BP BP       dB'.BP BP\n  dBBBP  dB'.BP  `BBBBb  dB'.BP  `BBBBb\n dBP    dB'.BP      dBP dB'.BP      dBP\ndBP    dBBBBP  dBBBBP' dBBBBP  dBBBBP'   v1.0\n");
-	vga_setColor(0x7, 0x0);
+	textColor = EGA_LGray;
 	printf("Copyright (c) 2022, the FOSOS developers.\n\n");
 
 	return 0;
@@ -163,7 +163,7 @@ int run(const char* name) {
 }
 
 void shell_handleInput() {
-	printf("\n");
+	putChar('\n');
 
 	char* argv[128];
 	int argc = strspl(shell_inbuf, ' ', argv, sizeof(argv) / sizeof(argv[0]));
@@ -172,40 +172,42 @@ void shell_handleInput() {
 	if(strlen(shell_inbuf) > 0) {
 		// Run command
 		invoke(argc, argv);
-		printf("\n");
+		putChar('\n');
 	}
 
 	// Prompt for next command
 	shell_prompt();
 
 	// Empty the input buffer
-	memset(shell_inbuf, 0, sizeof(shell_inbuf));
+	memset(shell_inbuf, 0, INBUF_SIZE);
 	shell_inbufPos = 0;
 }
 
 void shell_reset() {
 	// Reset screen and color
-	vga_setColor(0x7, 0x0);
+	textColor = EGA_LGray;
 	clearScreen();
 
 	// Print banner, time, and prompt
 	run("banner");
 	printf("%uKiB base memory\nHello, %s! Current time is ", system.memory, system.username);
 	run("date");
-	printf("\nType 'help' for a list of commands and use ctrl+c if you get stuck :-)\n");
+	printf("\nType 'help' for a list of commands and use ctrl+c if you get stuck :~)\n");
 	shell_prompt();
 
 	// Empty shell input buffer
-	memset(shell_inbuf, 0, sizeof(shell_inbuf));
+	memset(shell_inbuf, 0, INBUF_SIZE);
 	shell_inbufPos = 0;
 }
 
 void shell_init() {
+	shell_inbuf = (char*)malloc(INBUF_SIZE);
+
 	// Set system defaults
 	strcpy(system.username, "kai");
 	strcpy(system.sysname, "FOSOS");
 	strcpy(system.hostname, "native");
-	strcpy(system.release, "1.0-dev");
+	strcpy(system.release, "1.0.0-dev");
 	strcpy(system.machine, "i386");
 	strcpy(system.path, "/");
 

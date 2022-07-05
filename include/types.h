@@ -20,7 +20,11 @@ typedef byte UInt8;
 typedef word UInt16;
 typedef dword UInt32;
 
-typedef int PID;
+typedef UInt32 uint;
+
+typedef char Int8;
+typedef short Int16;
+typedef int Int32;
 
 typedef UInt8 bool;
 #define true 1

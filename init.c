@@ -7,23 +7,19 @@
 
 #include <types.h>
 #include <assert.h>
-#include <vga.h>
-#include <rtc.h>
-#include <pic.h>
-#include <i386.h>
+#include <video.h>
+#include <memory.h>
+#include <i8259.h>
+#include <cputable.h>
 #include <keyboard.h>
-#include <pit.h>
-#include <mem.h>
-#include <shell.h>
+#include <ps2mouse.h>
+#include <i8253.h>
+#include <rtc.h>
+#include <gui.h>
 
 void init() {
-	// Initialize things we need for debugging
-	vga_init();
-	debugf("[KRN] Starting FOSOS 1.0\n");
-
-	// Initialize memory manager and real-time clock
-	mem_init();
-	rtc_init();
+	// Initialize the memory manager
+	memory_init();
 
 	// Initialize the Programmable Interrupt Controller and CPU tables
 	pic_init();
@@ -32,15 +28,15 @@ void init() {
 
 	// Register interrupt handlers / initialize drivers
 	kbd_init();
+	ps2mouse_init();
 	pit_init();
+	rtc_init();
 
-	debugf("[KRN] Initialization complete, starting shell\n");
+	// Initialize the display
+	gui_init();
 
-	// Initialize the shell
-	shell_init();
-
-	// Enable interrupts, activating drivers
-	enableInterrupts();
+	// Enable interrupts
+	asm volatile("sti");
 
 	// Stay idle, until we get an interrupt
 	for(;;) asm volatile("hlt");

@@ -1,4 +1,4 @@
-/*
+/**
  * FOSOS port I/O functions
  *
  * Copyright (c) 2022, the FOSOS developers.

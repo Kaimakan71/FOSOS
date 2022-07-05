@@ -1,5 +1,5 @@
 /**
- * FOSOS real-time clock driver
+ * FOSOS default monospace font
  *
  * Copyright (c) 2022, the FOSOS developers.
  * SPDX-License-Identifier: BSD-2-Clause
@@ -8,8 +8,5 @@
 #pragma once
 
 #include <types.h>
-#include <ports.h>
-#include <video.h>
 
-void rtc_printDate();
-void rtc_init();
+extern byte font[][10];

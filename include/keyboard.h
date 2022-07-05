@@ -1,5 +1,5 @@
 /**
- * FOSOS keyboard driver
+ * FOSOS PS2-compatible mouse driver
  * Currently US-only (plans for more later)
  *
  * Copyright (c) 2022, the FOSOS developers.
@@ -9,11 +9,10 @@
 #pragma once
 
 #include <types.h>
-#include <i386.h>
+#include <cputable.h>
 #include <ports.h>
-#include <pic.h>
-#include <shell.h>
-#include <vga.h>
+#include <video.h>
+#include <i8259.h>
 
 #define IRQ_KEYBOARD 1
 
