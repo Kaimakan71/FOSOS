@@ -19,8 +19,8 @@ typedef struct {
 
 static byte map[MAP_SIZE];
 
-volatile uint total_allocated = 0;
-volatile uint total_free = HEAP_SIZE;
+uint total_allocated;
+uint total_free;
 
 #define heapFull() debugf("Cannot malloc: out of memory (heap size %u)\n", HEAP_SIZE); hang();
 
@@ -104,6 +104,9 @@ void free(void* ptr) {
 void memory_init() {
 	// Clear out the allocation map
 	memset(&map, 0, sizeof(map));
+
+	total_allocated = 0;
+	total_free = HEAP_SIZE;
 
 	debugf("Memory manager initialized with a heap size of %uKB\n", HEAP_SIZE / 1024);
 }

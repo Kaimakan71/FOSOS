@@ -20,6 +20,17 @@ typedef struct {
 	int menuHeight;
 } Theme;
 
+typedef struct {
+	char* name;
+	uint x;
+	uint y;
+	uint width;
+	uint height;
+	Color background;
+} Window;
+
 extern Theme theme;
-void createWindow(const char* name, int x, int y, int width, int height, Color background);
+Window* createWindow(const char* name, uint x, uint y, uint width, uint height, Color background);
+void handleDepress();
+void handleRelease();
 void gui_init();

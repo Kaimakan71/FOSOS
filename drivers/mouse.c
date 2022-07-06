@@ -11,8 +11,22 @@ uint mouseDataState = 0;
 byte mouseData[3];
 int mouseX = 320;
 int mouseY = 240;
-byte behindCursor = 0x00;
-byte cursorColor = EGA_White;
+#define cursorColor EGA_White
+#define cursorWidth 8
+#define cursorHeight 8
+bool leftBtn = false;
+
+byte cursorImage[] = {
+	0b10000000,
+	0b11000000,
+	0b11100000,
+	0b11110000,
+	0b11111000,
+	0b11100000,
+	0b10100000,
+	0b00010000
+};
+byte behindCursor[cursorHeight][cursorWidth];
 
 IRQHANDLER(12);
 
@@ -34,6 +48,28 @@ void waitAndWrite(UInt8 port, byte data) {
 #define read() waitAndRead(0x60);
 #define write(data) waitAndWrite(0x64, 0xd4); waitAndWrite(0x60, data);
 
+#define drawCursorImage() { \
+	for(uint iy = 0; iy < cursorHeight; iy++) { \
+		for(uint ix = 0; ix < cursorWidth; ix++) { \
+			byte* addr = (byte*)(videoMemory + mouseX + ix + ((mouseY + iy) * pitch)); \
+			behindCursor[iy][ix] = *addr; \
+			if((mouseX + ix < screenWidth) && ((cursorImage[iy] << ix) & 0x80)) *addr = cursorColor; \
+		} \
+	} \
+}
+
+#define clearCursorImage(x, y) { \
+	for(uint iy = 0; iy < cursorHeight; iy++) { \
+		for(uint ix = 0; ix < cursorWidth; ix++) { \
+			*(byte*)(videoMemory + x + ix + ((y + iy) * pitch)) = behindCursor[iy][ix]; \
+		} \
+	} \
+}
+
+void drawCursor() {
+	drawCursorImage();
+}
+
 void handleIRQ12() {
 	mouseData[mouseDataState] = inb(0x60);
 
@@ -43,7 +79,9 @@ void handleIRQ12() {
 		mouseDataState++;
 	} else if(mouseDataState == 2) {
 		mouseDataState = 0;
-		byte* oldPos = (byte*)(videoMemory + mouseX + (mouseY * pitch));
+
+		int oldX = mouseX;
+		int oldY = mouseY;
 
 		mouseX += (Int8)mouseData[2];
 		mouseY += (Int8)-mouseData[0];
@@ -53,18 +91,23 @@ void handleIRQ12() {
 		if(mouseY < 0) mouseY = 0;
 		else if(mouseY >= screenHeight) mouseY = screenHeight - 1;
 
-		byte* newPos = (byte*)(videoMemory + mouseX + (mouseY * pitch));
+		if(mouseData[1] & 1) {
+			// Left button depressed
+			if(!leftBtn) {
+				leftBtn = true;
+				handleDepress();
+			}
+		} else if(leftBtn) {
+			// Left button released
+			leftBtn = false;
+			handleRelease();
+		}
 
-		*oldPos = behindCursor;
-		behindCursor = *newPos;
-		*newPos = cursorColor;
+		clearCursorImage(oldX, oldY);
+		drawCursorImage();
 	}
 
 	exitIRQHandler(IRQ_PS2MOUSE);
-}
-
-void drawMouse() {
-	*(byte*)(videoMemory + mouseX + (mouseY * pitch)) = cursorColor;
 }
 
 void mouse_init() {
@@ -89,9 +132,6 @@ void mouse_init() {
 	write(0xf4);
 	byte ack2 = read();
 	ASSERT(ack2 == 0xfa);
-
-	// Draw the cursor at the current position
-	drawMouse();
 
 	enableIRQ(IRQ_PS2MOUSE);
 

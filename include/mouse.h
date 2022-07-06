@@ -12,11 +12,12 @@
 #include <video.h>
 #include <cputable.h>
 #include <i8259.h>
+#include <gui.h>
 
 extern int mouseX;
 extern int mouseY;
 
 #define IRQ_PS2MOUSE 12
 
-void drawMouse();
+void drawCursor();
 void mouse_init();

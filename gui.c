@@ -8,6 +8,9 @@
 #include <gui.h>
 
 Theme theme;
+uint windowCount = 0;
+int currentWindowId = -1;
+Window** windows;
 
 #define clearScreen() fillScreen(theme.secondary);
 
@@ -39,31 +42,52 @@ void drawButton(const char* text, int x, int y, int height) {
 	drawString(text, x + 4, y + 4, EGA_White);
 }
 
-void drawWindow(const char* title, int x, int y, int width, int height, Color background) {
-	fillRect(x, y, width, height, theme.primary);
+void drawWindow(Window* window) {
+	fillRect(window->x, window->y, window->width, window->height, theme.primary);
 
 	// Top/left border
-	drawHLine(x + 1, y + 1, width - 2, theme.tertiary);
-	drawVLine(x + 1, y + 1, height - 2, theme.tertiary);
+	drawHLine(window->x + 1, window->y + 1, window->width - 2, theme.tertiary);
+	drawVLine(window->x + 1, window->y + 1, window->height - 2, theme.tertiary);
 
 	// Bottom/right border
-	drawHLine(x + 1, y + height - 2, width - 2, theme.tertiary);
-	drawVLine(x + width - 2, y + 1, height - 2, theme.tertiary);
+	drawHLine(window->x + 1, window->y + window->height - 2, window->width - 2, theme.tertiary);
+	drawVLine(window->x + window->width - 2, window->y + 1, window->height - 2, theme.tertiary);
 
 	// Titlebar
-	fillRect(x + 3, y + 3, width - 6, theme.menuHeight, EGA_LBlue);
-	drawString(title, x + 7, y + 7, EGA_White);
+	fillRect(window->x + 3, window->y + 3, window->width - 6, theme.menuHeight, EGA_LBlue);
+	drawString(window->name, window->x + 7, window->y + 7, EGA_White);
 	
 	// Background
-	fillRect(x + 3, y + theme.menuHeight + 4, width - 6, height - theme.menuHeight - 6, background);
+	fillRect(window->x + 3, window->y + theme.menuHeight + 4, window->width - 6, window->height - theme.menuHeight - 6, window->background);
 
 	// Make sure the mouse wasn't covered
-	drawMouse();
+	drawCursor();
 }
 
-void createWindow(const char* name, int x, int y, int width, int height, Color background) {
-	debugf("Creating window '%s'\n", name);
-	drawWindow(name, x, y, width, height, background);
+Window* createWindow(const char* name, uint x, uint y, uint width, uint height, Color background) {
+	currentWindowId = windowCount++;
+
+	debugf("Creating window '%s' with id %d\n", name, currentWindowId);
+
+	Window* window = windows[currentWindowId];
+	window->name = (char*)name;
+	window->x = x;
+	window->y = y;
+	window->width = width;
+	window->height = height;
+	window->background = background;
+
+	drawWindow(window);
+
+	return window;
+}
+
+void handleDepress() {
+	debugf("Mouse button depressed at (%d, %d)\n", mouseX, mouseY);
+}
+
+void handleRelease() {
+	debugf("Mouse button released at (%d, %d)\n", mouseX, mouseY);
 }
 
 void gui_init() {
@@ -76,5 +100,10 @@ void gui_init() {
 	theme.menuHeight = screenHeight * 0.04;
 
 	clearScreen();
+
+	windows = malloc(sizeof(Window*) * 256);
+
 	mouse_init();
+	// Draw the cursor at the current position
+	drawCursor();
 }

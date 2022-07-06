@@ -31,7 +31,7 @@ build/kernel.bin: $(OBJ)
 	@echo "Linking object files"; ld -T build/linker.ld --strip-debug -melf_i386 --gc-sections --build-id=none -z norelro -z now -o build/kernel.bin -Ttext 0x10000 $(OBJ)
 
 .c.o:
-	@echo "Compiling $<"; gcc -Wextra -Wall -Wundef -Wcast-qual -Wwrite-strings -Wno-unused-parameter -Os -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -ffreestanding -fno-stack-protector -fno-ident -fno-builtin -mregparm=3 -march=i386 -m32 -fno-exceptions -fmerge-all-constants -fno-unroll-loops -fno-pie -fno-pic -nostdinc -nostdlib -Iinclude -o $@ -c $<
+	@echo "Compiling $<"; gcc -Wextra -Wall -Wundef -Wwrite-strings -Wno-unused-parameter -Os -fno-asynchronous-unwind-tables -fno-omit-frame-pointer -ffreestanding -fno-stack-protector -fno-ident -fno-builtin -mregparm=3 -march=i386 -m32 -fno-exceptions -fmerge-all-constants -fno-unroll-loops -fno-pie -fno-pic -nostdinc -nostdlib -Iinclude -o $@ -c $<
 
 clean:
 	@echo "Cleaning"; rm -f build/boot.bin build/kernel.bin $(OBJ)
